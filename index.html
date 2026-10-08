@@ -237,12 +237,12 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
 (function () {
   var plan = [
     { title: 'Vormittag', items: [
-      { t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
-      { t: '10:45', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts', m: 'auris' },
-      { t: '10:45', w: 'Metacam', h: 'Mit dem Frühstück, Menge laut Etikett', k: 'oral', tag: 'Oral', m: 'meta' },
-      { t: '11:45', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts', m: 'bay' }
+      { id: 's0i4', t: '10:00', w: 'Metacam', h: 'Als Erstes am Morgen, Menge laut Etikett', k: 'oral', tag: 'Oral', m: 'meta' },
+      { id: 's0i0', t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { id: 's0i1', t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
+      { id: 's0i2', t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
+      { id: 's0i3', t: '10:45', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts', m: 'auris' },
+      { id: 's0i5', t: '11:45', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts', m: 'bay' }
     ]},
     { title: 'Mittag', items: [
       { t: '12:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
@@ -312,7 +312,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   plan.forEach(function (sec, si) {
     var list = '';
     sec.items.forEach(function (it, ii) {
-      var id = 's' + si + 'i' + ii;
+      var id = it.id || ('s' + si + 'i' + ii);
       all.push({ id: id, it: it });
       list += rowHtml(id, it, true);
     });
@@ -379,7 +379,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     document.getElementById('bar').setAttribute('aria-valuenow', pct);
     plan.forEach(function (sec, si) {
       var d = 0;
-      sec.items.forEach(function (it, ii) { if (state['s' + si + 'i' + ii]) d++; });
+      sec.items.forEach(function (it, ii) { if (state[it.id || ('s' + si + 'i' + ii)]) d++; });
       document.querySelector('[data-sec="' + si + '"] .secount').textContent = d + ' von ' + sec.items.length;
     });
     once.forEach(function (o) {
@@ -588,7 +588,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       pick.i++;
       pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
     }
-    // Ohr und Metacam folgen den ersten Augentropfen, Baytril folgt der Spülung
+    // Ohr folgt den ersten Augentropfen, Metacam kommt als Erstes, Baytril folgt der Spülung
     var firstDrops = null;
     eyeMeds.forEach(function (md) {
       var f = itemOf(md.m)[0];
@@ -599,7 +599,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var earBase = plannedMs(au.it);
     if (firstDrops !== null) earBase = Math.max(earBase, firstDrops + GAP);
     if (!state[au.id]) exp[au.id] = earBase;
-    if (!state[me.id]) exp[me.id] = Math.max(plannedMs(me.it), earBase);
+    if (!state[me.id]) exp[me.id] = plannedMs(me.it);
     if (!state[ba.id]) {
       var aAt = state[au.id] ? stamp(au.id) : null;
       var aEff = aAt !== null ? aAt : Math.max(earBase, nowUp);
