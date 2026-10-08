@@ -102,6 +102,11 @@ h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0; letter-spa
 
 section { display: flex; flex-direction: column; gap: 8px; }
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-inline: 2px; }
+.fold { font: inherit; color: inherit; background: none; border: 0; padding: 6px 0; margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; }
+.fold .chev { width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.15s; margin-top: -3px; }
+section.folded .fold .chev { transform: rotate(-45deg); margin-top: 0; }
+section.folded .list { display: none; }
+section.folded .sec-head span.secount::after { content: ' · eingeklappt'; }
 .sec-head span { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 .list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 
@@ -328,7 +333,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       all.push({ id: id, it: it, si: si });
       list += rowHtml(id, it, true);
     });
-    html += '<section data-sec="' + si + '"><div class="sec-head"><h2>' + sec.title + '</h2><span class="secount"></span></div><ul class="list">' + list + '</ul></section>';
+    html += '<section data-sec="' + si + '"><div class="sec-head"><h2><button class="fold" type="button" aria-expanded="true">' + sec.title + '<i class="chev"></i></button></h2><span class="secount"></span></div><ul class="list">' + list + '</ul></section>';
   });
   document.getElementById('sections').innerHTML = '<div style="display:flex;flex-direction:column;gap:20px">' + html + '</div>';
   document.getElementById('once').innerHTML = once.map(function (o) { return rowHtml(o.id, o, false); }).join('');
@@ -340,6 +345,17 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   }
 
   var editing = null;
+  var folds = {};
+  try { folds = JSON.parse(localStorage.getItem('hundeplan-fold') || '{}') || {}; } catch (e) { folds = {}; }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.fold');
+    if (!b) return;
+    var sec = b.closest('section'), si = sec.getAttribute('data-sec');
+    var nowFolded = !sec.classList.contains('folded');
+    folds[si] = { v: nowFolded, auto: sec.getAttribute('data-closed') === '1' };
+    try { localStorage.setItem('hundeplan-fold', JSON.stringify(folds)); } catch (er) {}
+    apply();
+  });
   function applyBy() {
     var ids = all.map(function (a) { return a.id; }).concat(ear.map(function (o) { return o.id; })).concat(once.map(function (o) { return o.id; }));
     ids.forEach(function (id) {
@@ -404,6 +420,14 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       var d = 0;
       sec.items.forEach(function (it, ii) { if (state[it.id || ('s' + si + 'i' + ii)]) d++; });
       document.querySelector('[data-sec="' + si + '"] .secount').textContent = d + ' von ' + sec.items.length;
+      var closed = sec.items.every(function (it, ii) { var id = it.id || ('s' + si + 'i' + ii); return state[id] || sk[id]; });
+      var ov = folds[si];
+      var folded = ov && ov.auto === closed ? ov.v : closed;
+      var secEl = document.querySelector('[data-sec="' + si + '"]');
+      secEl.classList.toggle('folded', folded);
+      secEl.style.order = closed ? 1 : 0;
+      secEl.querySelector('.fold').setAttribute('aria-expanded', folded ? 'false' : 'true');
+      secEl.setAttribute('data-closed', closed ? '1' : '0');
     });
     once.forEach(function (o) {
       var cb = document.getElementById('c-' + o.id);

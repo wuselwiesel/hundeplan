@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hundeplan – Entwurf Nur das Nächste</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;color-scheme:light}
+body{margin:0}
+[hidden]{display:none!important}
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #1c2927;
+  --muted: #5d6e6a;
+  --line: #d9e2df;
+  --auge: #2f6fb0;
+  --auge-bg: #e3eefa;
+  --ohr: #b5651d;
+  --ohr-bg: #fbeedd;
+  --oral: #3f7d4e;
+  --oral-bg: #e2f1e6;
+  --accent: #1f6f66;
+  --accent-fg: #ffffff;
+  --focus: #1f6f66;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121a19;
+    --surface: #1b2625;
+    --fg: #e6efed;
+    --muted: #9bb0ab;
+    --line: #2f3f3d;
+    --auge: #7fb4ea;
+    --auge-bg: #1d2f45;
+    --ohr: #e5a566;
+    --ohr-bg: #3a2b1a;
+    --oral: #85c796;
+    --oral-bg: #1e3326;
+    --accent: #5fc4b8;
+    --accent-fg: #0d1a18;
+    --focus: #5fc4b8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121a19;
+  --surface: #1b2625;
+  --fg: #e6efed;
+  --muted: #9bb0ab;
+  --line: #2f3f3d;
+  --auge: #7fb4ea;
+  --auge-bg: #1d2f45;
+  --ohr: #e5a566;
+  --ohr-bg: #3a2b1a;
+  --oral: #85c796;
+  --oral-bg: #1e3326;
+  --accent: #5fc4b8;
+  --accent-fg: #0d1a18;
+  --focus: #5fc4b8;
+  color-scheme: dark;
+}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.45;padding:20px 16px 40px}
+.wrap{max-width:560px;margin-inline:auto;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--font-display);font-size:1.6rem;line-height:1.15;margin:0}
+h2{font-family:var(--font-display);font-size:1.05rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.95rem}
+.demo{background:var(--ohr-bg);color:var(--ohr);border-radius:12px;padding:10px 14px;font-size:.9rem;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.demo b{font-weight:600}
+.demo button{font:inherit;font-weight:600;font-size:.85rem;border:1px solid var(--ohr);background:transparent;color:var(--ohr);border-radius:8px;padding:6px 10px;min-height:36px;cursor:pointer}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.hero{border:2px solid var(--accent)}
+.kicker{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.tag{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;display:inline-block}
+.tag.auge{color:var(--auge);background:var(--auge-bg)}.tag.ohr{color:var(--ohr);background:var(--ohr-bg)}.tag.oral{color:var(--oral);background:var(--oral-bg)}
+.med{font-family:var(--font-display);font-size:1.7rem;line-height:1.1;margin:0}
+.how{color:var(--muted)}
+.lager{font-weight:600;font-size:.9rem;color:var(--muted)}.lager.no{color:var(--ohr)}
+.timer{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big{font-family:var(--font-display);font-size:2.4rem;font-variant-numeric:tabular-nums;line-height:1}
+.big.go{color:var(--accent)}
+.at{color:var(--muted);font-size:.95rem}
+.btn{font:inherit;font-weight:600;font-size:1.05rem;border-radius:12px;min-height:56px;padding:12px 18px;cursor:pointer;border:2px solid var(--accent);background:var(--accent);color:var(--accent-fg);width:100%}
+.btn.wait{background:transparent;color:var(--accent)}
+.link{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:6px 0;min-height:36px;text-align:left}
+.gap{background:var(--ohr-bg);color:var(--ohr);border-radius:10px;padding:8px 12px;font-size:.9rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1 1 30%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.chip b{font-family:var(--font-display);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.chip span{font-size:.85rem;color:var(--muted)}
+.chip i{height:6px;border-radius:99px;background:var(--line);overflow:hidden;display:block;margin-top:4px}
+.chip i u{display:block;height:100%;background:var(--accent);text-decoration:none}
+.q{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
+.q li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.q li:first-child{border-top:0}
+.n{width:28px;height:28px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:.8rem;font-weight:600;font-variant-numeric:tabular-nums}
+.q .w{font-weight:600}.q .t{color:var(--muted);font-size:.85rem}
+.q .e{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums;text-align:right}
+.chk{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.chk:first-of-type{border-top:0}
+.chk input{width:26px;height:26px;accent-color:var(--accent);margin:0}
+.chk .w{font-weight:600}.chk .t{color:var(--muted);font-size:.9rem}
+.chk.done .w{text-decoration:line-through;opacity:.6}
+details summary{cursor:pointer;font-family:var(--font-display);font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;gap:8px;min-height:36px;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary span{font-family:var(--font-body);font-size:.85rem;color:var(--muted)}
+.done-list{margin:8px 0 0;padding:0;list-style:none}
+.done-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:.95rem}
+.done-list .tm{font-variant-numeric:tabular-nums;color:var(--muted)}
+.editor{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.editor input{font:inherit;font-size:16px;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;padding:8px 10px;min-height:44px}
+.editor button{font:inherit;font-weight:600;border-radius:10px;min-height:44px;padding:8px 14px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.editor button.sec{background:transparent;color:var(--fg);border-color:var(--line)}
+.fin{text-align:center;padding:18px 8px}
+</style></head><body><div class="wrap">
+<header><h1>Entwurf: nur das Nächste</h1><p class="sub">Keine festen Uhrzeiten. Immer eine Gabe im Blick, dahinter die Reihenfolge.</p></header>
+<div class="demo"><span>Das ist ein <b>Beispiel</b> mit den Daten von heute. Nichts wird gespeichert.</span><span><button id="ff" type="button">+15 Min. vorspulen</button> <button id="rs" type="button">Neu starten</button></span></div>
+<div id="app"></div>
+</div>
+<script>
+(function(){
+var MEDS={rego:{n:'Regoculan',k:'auge',tag:'Auge links',h:'1 Tropfen',l:'Im Kühlschrank lagern',tot:6},cef:{n:'Cefenicol',k:'auge',tag:'Auge links',h:'1 Tropfen',l:'Im Kühlschrank lagern',tot:4},stro:{n:'Stromease',k:'auge',tag:'Auge links',h:'1 Tropfen',l:'NICHT im Kühlschrank lagern',tot:4}};
+var ORDER=['rego','cef','stro','rego','cef','stro','rego','rego','cef','stro','rego','cef','rego','stro'];
+var OTHER=[{id:'meta',n:'Metacam',k:'oral',tag:'Oral',h:'Als Erstes am Morgen, Menge laut Etikett'},{id:'auris',n:'Auris Ohrreiniger',k:'ohr',tag:'Ohr rechts',h:'Ohr fluten, danach 1 Minute massieren'},{id:'bay',n:'Baytril-Ohrlösung',k:'ohr',tag:'Ohr rechts',h:'1 ml, eine Stunde nach der Spülung'}];
+var GAP=15*60000;
+var base,offset,given,other,editing;
+function d(h,m){var x=new Date();x.setHours(h,m,0,0);return x.getTime();}
+function reset(){base=Date.now();var start=d(17,56);offset=start-base;
+ given=[{m:'rego',at:d(10,0)},{m:'cef',at:d(10,15)},{m:'stro',at:d(10,30)},{m:'rego',at:d(16,49)},{m:'cef',at:d(17,9)},{m:'stro',at:d(17,49)}];
+ other={meta:d(14,50),auris:null,bay:null};editing=null;render();}
+function now(){return Date.now()+offset;}
+function hm(ms){var x=new Date(ms);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0');}
+function cd(ms){var s=Math.max(0,Math.round(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return h>0?h+' Std. '+String(m).padStart(2,'0')+' Min.':String(m).padStart(2,'0')+':'+String(r).padStart(2,'0')+' Min.';}
+function lastAt(){return given.reduce(function(a,g){return Math.max(a,g.at);},0);}
+function queue(){return ORDER.slice(given.length);}
+function render(){
+ var q=queue(), app=document.getElementById('app'), h='';
+ var due=lastAt()+GAP, wait=due-now();
+ var cnt={};given.forEach(function(g){cnt[g.m]=(cnt[g.m]||0)+1;});
+ if(!q.length){h+='<div class="card hero fin"><div class="kicker">Geschafft</div><p class="med">Alle Augentropfen für heute gegeben</p></div>';}
+ else{var m=MEDS[q[0]];
+  h+='<div class="card hero"><span class="kicker">'+(wait>0?'Gleich dran':'Jetzt dran')+'</span>'+
+  '<div><span class="tag '+m.k+'">'+m.tag+'</span></div><h2 class="med">'+m.n+'</h2><div class="how">'+m.h+'</div><div class="lager'+(q[0]==='stro'?' no':'')+'">'+m.l+'</div>'+
+  '<div class="timer"><span class="big'+(wait>0?'':' go')+'" id="big">'+(wait>0?cd(wait):'Jetzt')+'</span><span class="at">'+(wait>0?'ab '+hm(due)+' Uhr':'seit '+hm(due)+' Uhr möglich')+'</span></div>'+
+  (wait>0?'<div class="gap">15 Minuten Abstand zur letzten Gabe ('+MEDS[given[given.length-1].m].n+' um '+hm(lastAt())+' Uhr)</div>':'')+
+  '<button class="btn'+(wait>0?' wait':'')+'" id="give" type="button">'+(wait>0?'Trotzdem jetzt gegeben':'Gegeben')+'</button>'+
+  (editing==='new'?'<div class="editor"><input type="time" id="tin" value="'+hm(now())+'"><button id="tok" type="button">Speichern</button><button class="sec" id="tno" type="button">Abbrechen</button></div>':'<button class="link" id="other" type="button">Mit anderer Uhrzeit eintragen</button>')+'</div>';
+  if(q.length>1){h+='<div class="card"><h2>Danach</h2><ul class="q">';
+   var t=Math.max(due,now());
+   q.slice(1,4).forEach(function(k,i){t+=GAP;var mm=MEDS[k];h+='<li><span class="n">'+(i+2)+'</span><span><span class="w">'+mm.n+'</span><br><span class="t">'+(k==='stro'?'NICHT im Kühlschrank lagern':'Im Kühlschrank lagern')+'</span></span><span class="e">frühestens<br>ca. '+hm(Math.max(t,t))+'</span></li>';});
+   h+='</ul><span class="at">Danach noch '+Math.max(0,q.length-4)+' weitere Gaben. Die Uhrzeiten rechnen sich nach jeder Gabe neu.</span></div>';}
+ }
+ h+='<div class="chips">'+Object.keys(MEDS).map(function(k){var c=cnt[k]||0,tot=MEDS[k].tot;return '<div class="chip"><span>'+MEDS[k].n+'</span><b>'+c+' von '+tot+'</b><i><u style="width:'+(c/tot*100)+'%"></u></i></div>';}).join('')+'</div>';
+ h+='<div class="card"><h2>Ohne Uhrzeit</h2><div>'+OTHER.map(function(o){var dn=other[o.id];return '<label class="chk'+(dn?' done':'')+'"><input type="checkbox" data-o="'+o.id+'"'+(dn?' checked':'')+'><span><span class="w">'+o.n+'</span><br><span class="t">'+(dn?'Gegeben um '+hm(dn)+' Uhr':o.h)+'</span></span></label>';}).join('')+'</div></div>';
+ h+='<div class="card"><details><summary>Erledigt heute <span>'+given.length+' Gaben</span></summary><ul class="done-list">'+given.slice().reverse().map(function(g){return '<li><span>'+MEDS[g.m].n+'</span><span class="tm">'+hm(g.at)+' Uhr</span></li>';}).join('')+'</ul></details></div>';
+ app.innerHTML=h;
+ var gv=document.getElementById('give');if(gv)gv.onclick=function(){add(now());};
+ var ot=document.getElementById('other');if(ot)ot.onclick=function(){editing='new';render();};
+ var tok=document.getElementById('tok');if(tok){tok.onclick=function(){var v=document.getElementById('tin').value.split(':');var x=new Date(now());x.setHours(+v[0],+v[1],0,0);editing=null;add(Math.min(x.getTime(),now()));};document.getElementById('tno').onclick=function(){editing=null;render();};}
+ Array.prototype.forEach.call(app.querySelectorAll('[data-o]'),function(c){c.onchange=function(){other[c.getAttribute('data-o')]=c.checked?now():null;render();};});
+}
+function add(at){var q=queue();if(!q.length)return;given.push({m:q[0],at:at});render();}
+setInterval(function(){var q=queue();if(!q.length)return;var due=lastAt()+GAP,w=due-now(),b=document.getElementById('big');if(!b)return;if(w>0){b.textContent=cd(w);}else if(b.textContent!=='Jetzt'){render();}},1000);
+document.getElementById('ff').onclick=function(){offset+=GAP;render();};
+document.getElementById('rs').onclick=reset;
+reset();
+})();
+</script></body></html>
