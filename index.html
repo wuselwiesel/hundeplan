@@ -138,6 +138,8 @@ button.reset:focus-visible { outline: 3px solid var(--focus); outline-offset: 2p
 .confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .confirm p { margin: 0; flex-basis: 100%; font-size: 0.95rem; }
 button.danger { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.lager { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.lager.no { color: var(--ohr); }
 .shift { font-size: 0.75rem; font-weight: 600; color: var(--ohr); }
 .by { font-size: 0.9rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 .item input:disabled { cursor: default; }
@@ -304,13 +306,15 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   setDatum();
 
   var check = '<svg viewBox="0 0 16 16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+  var LAGER = { rego: 'Im Kühlschrank lagern', cef: 'Im Kühlschrank lagern', stro: 'NICHT im Kühlschrank lagern' };
   function rowHtml(id, it, withTime) {
+    var lg = it.m && LAGER[it.m] ? '<span class="lager' + (it.m === 'stro' ? ' no' : '') + '">' + LAGER[it.m] + '</span>' : '';
     return '<li class="item" data-id="' + id + '">' +
       '<input type="checkbox" id="c-' + id + '" aria-label="' + (withTime ? it.t + ' Uhr, ' : '') + it.w + ', ' + it.tag + '">' +
       '<div class="row"><span class="box">' + check + '</span><span class="text">' +
       '<span class="line1">' + (withTime ? '<span class="time">' + it.t + '</span><span class="shift" hidden></span>' : '') +
       '<span class="tag ' + it.k + '">' + it.tag + '</span><span class="now" hidden>Als Nächstes</span></span>' +
-      '<span class="what">' + it.w + '</span><span class="how">' + it.h + '</span>' +
+      '<span class="what">' + it.w + '</span><span class="how">' + it.h + '</span>' + lg +
       '<span class="byrow" hidden><span class="bytxt"></span><button class="edit" type="button">Zeit ändern</button></span>' +
       '<span class="editor" hidden><input class="tin" type="time" aria-label="Uhrzeit"><button class="tok" type="button">Speichern</button><button class="tcancel" type="button">Abbrechen</button><span class="editmsg" hidden></span></span></span></div></li>';
   }
