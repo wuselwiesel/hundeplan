@@ -561,7 +561,6 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var d = new Date(ms);
     var txt = fmtTime(d.toISOString());
     var base = new Date(dayKey + 'T00:00:00');
-    if (d.getDate() !== base.getDate()) txt += ' (morgen)';
     return txt;
   }
   function plannedMs(it) { return Date.parse(dayKey + 'T' + it.t + ':00'); }
@@ -587,7 +586,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
         if (lastEye === null || t > lastEye) lastEye = t;
       });
       st[md.m] = { md: md, pending: pending, i: 0,
-        next: pending.length ? (last !== null ? last + md.every * 60000 : plannedMs(pending[0].it)) : null };
+        next: pending.length ? (last !== null ? last + md.every * 60000 : (lastEye !== null && pending[0] === items[0] ? 0 : plannedMs(pending[0].it))) : null };
     });
     var prevEnd = lastEye !== null ? lastEye + GAP : -Infinity;
     for (;;) {
@@ -604,11 +603,15 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       pick.i++;
       pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
     }
+    // Der Plan gilt nur für diesen Tag: nichts wird nach 23:59 angezeigt
+    var endOfDay = Date.parse(dayKey + 'T23:59:00');
+    Object.keys(exp).forEach(function (k) { if (exp[k] > endOfDay) exp[k] = endOfDay; });
     return exp;
   }
 
   function renderTimers() {
     var nowMs = Date.now();
+    if (todayKey() !== dayKey) { dayKey = todayKey(); setDatum(); state = {}; editing = null; apply(); poll(); return; }
     var exp = buildSchedule();
     var eyeLast = null;
 
