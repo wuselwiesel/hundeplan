@@ -646,7 +646,8 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       }
     });
 
-    // Timer je Medikament
+    // Timer je Medikament, das früheste zuerst
+    var order = [];
     meds.forEach(function (md) {
       var row = tl.querySelector('[data-m="' + md.m + '"]');
       var items = itemOf(md.m).filter(function (a) { return !sk[a.id]; });
@@ -655,24 +656,20 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       givenItems.forEach(function (a) { var t = stamp(a.id); if (t !== null && (last === null || t > last)) last = t; });
       if (md.k === 'auge' && last !== null && (eyeLast === null || last > eyeLast)) eyeLast = last;
 
-      var cnt = '', sub = '', cls = '';
+      var cnt = '', sub = '', cls = '', due0 = null;
       var multi = items.length > 1;
-      var tail = multi ? ' · ' + givenItems.length + ' von ' + items.length : '';
+      var left = items.length - givenItems.length;
+      var tail = multi ? ' · noch ' + left + ' heute' : '';
 
       if (givenItems.length >= items.length) {
         cnt = 'Fertig'; cls = 'done';
-        sub = md.m === 'meta' && last !== null ? 'Nächste Gabe morgen gegen ' + fmtTime(new Date(last).toISOString()) + ' Uhr'
-            : multi ? 'Heute alle ' + items.length + ' Gaben erledigt' : 'Heute erledigt';
+        sub = multi ? 'Heute alle ' + items.length + ' Gaben erledigt' : 'Heute erledigt';
       } else {
         var first = items.filter(function (a) { return !state[a.id]; })[0];
         var due = exp[first.id];
         var diff = due - nowMs;
-        var preOk = true;
-        if (md.after) { var pre = itemOf(md.after)[0]; preOk = !!state[pre.id]; }
-        if (!preOk) {
-          cnt = 'Offen'; cls = 'idle';
-          sub = 'Nach der Auris-Spülung, ca. ' + clock(due) + ' Uhr';
-        } else if (givenItems.length > 0 || diff <= 60 * 60000) {
+        due0 = due;
+        if (givenItems.length > 0 || diff <= 60 * 60000) {
           if (diff > 0) {
             cnt = fmtCount(diff); cls = 'wait';
             sub = 'Nächste Gabe um ' + clock(due) + ' Uhr' + tail;
@@ -686,10 +683,14 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
           sub = 'Geplant: ' + clock(due) + ' Uhr' + tail;
         }
       }
+      order.push({ row: row, key: cls === 'done' ? Infinity : (due0 === null ? Infinity : due0) });
       setText(row.querySelector('.tcount'), cnt);
       setText(row.querySelector('.tsub'), sub);
       if (row.getAttribute('data-state') !== cls) row.setAttribute('data-state', cls);
     });
+
+    order.sort(function (a, b) { return a.key - b.key; });
+    order.forEach(function (o, i) { if (tl.children[i] !== o.row) tl.insertBefore(o.row, tl.children[i] || null); });
 
     var gap = document.getElementById('gap');
     var gapLeft = eyeLast !== null ? eyeLast + EYE_GAP_MIN * 60000 - nowMs : 0;
