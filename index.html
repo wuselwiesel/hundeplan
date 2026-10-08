@@ -573,6 +573,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     all.forEach(function (a) { if (!state[a.id] && a.it.k === 'auge' && a.si < pos) sk[a.id] = true; });
     return sk;
   }
+  function eod() { return Date.parse(dayKey + 'T23:59:00'); }
   function itemOf(m) { return all.filter(function (a) { return a.it.m === m; }); }
 
   // Erwartete Zeit je offener Gabe, abgeleitet aus den echten Abhak-Zeiten
@@ -614,7 +615,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
     }
     // Der Plan gilt nur für diesen Tag: nichts wird nach 23:59 angezeigt
-    var endOfDay = Date.parse(dayKey + 'T23:59:00');
+    var endOfDay = eod();
     Object.keys(exp).forEach(function (k) { if (exp[k] > endOfDay) exp[k] = endOfDay; });
     return exp;
   }
@@ -636,6 +637,9 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       if (sk[a.id]) {
         setText(te, a.it.t);
         setText(sh, 'übersprungen'); sh.hidden = false;
+      } else if (!state[a.id] && exp[a.id] !== undefined && exp[a.id] >= eod()) {
+        setText(te, a.it.t);
+        setText(sh, 'heute nicht mehr'); sh.hidden = false;
       } else if (state[a.id] || exp[a.id] === undefined) {
         setText(te, a.it.t);
         sh.hidden = true;
@@ -669,7 +673,10 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
         var due = exp[first.id];
         var diff = due - nowMs;
         due0 = due;
-        if (givenItems.length > 0 || diff <= 60 * 60000) {
+        if (due >= eod()) {
+          cnt = 'Offen'; cls = 'idle';
+          sub = 'Heute nicht mehr' + tail;
+        } else if (givenItems.length > 0 || diff <= 60 * 60000) {
           if (diff > 0) {
             cnt = fmtCount(diff); cls = 'wait';
             sub = 'Nächste Gabe um ' + clock(due) + ' Uhr' + tail;
@@ -689,6 +696,13 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       if (row.getAttribute('data-state') !== cls) row.setAttribute('data-state', cls);
     });
 
+    var nx = null;
+    all.forEach(function (a) { if (!nx && !state[a.id] && !sk[a.id] && exp[a.id] !== undefined && exp[a.id] < eod()) nx = a; });
+    if (nx) {
+      var nextEl = document.getElementById('next');
+      var nh = 'Als Nächstes: <b>' + clock(exp[nx.id]) + ' Uhr, ' + nx.it.w + '</b>';
+      if (nextEl.innerHTML !== nh) nextEl.innerHTML = nh;
+    }
     order.sort(function (a, b) { return a.key - b.key; });
     order.forEach(function (o, i) { if (tl.children[i] !== o.row) tl.insertBefore(o.row, tl.children[i] || null); });
 
