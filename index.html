@@ -214,7 +214,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   <div id="sections"></div>
 
   <section>
-    <div class="sec-head"><h2>Ohr rechts, ohne Uhrzeit</h2><span class="secount" id="earcount"></span></div>
+    <div class="sec-head"><h2>Ohne Uhrzeit</h2><span class="secount" id="earcount"></span></div>
     <ul class="list" id="ear"></ul>
   </section>
 
@@ -242,7 +242,6 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
 (function () {
   var plan = [
     { title: 'Vormittag', items: [
-      { id: 's0i4', t: '10:00', w: 'Metacam', h: 'Als Erstes am Morgen, Menge laut Etikett', k: 'oral', tag: 'Oral', m: 'meta' },
       { id: 's0i0', t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
       { id: 's0i1', t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
       { id: 's0i2', t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
@@ -266,6 +265,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     ]}
   ];
   var ear = [
+    { id: 's0i4', w: 'Metacam', h: 'Als Erstes am Morgen, Menge laut Etikett', k: 'oral', tag: 'Oral' },
     { id: 's0i3', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts' },
     { id: 's0i5', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts' }
   ];
@@ -534,8 +534,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   var meds = [
     { m: 'rego', name: 'Regoculan', k: 'auge', every: 150, note: 'alle 2,5 Std.' },
     { m: 'cef', name: 'Cefenicol', k: 'auge', every: 240, note: 'alle 4 Std.' },
-    { m: 'stro', name: 'Stromease', k: 'auge', every: 240, note: 'alle 4 Std.' },
-    { m: 'meta', name: 'Metacam', k: 'oral', every: 1440, note: '1x täglich' }
+    { m: 'stro', name: 'Stromease', k: 'auge', every: 240, note: 'alle 4 Std.' }
   ];
   var EYE_GAP_MIN = 15;
   var tl = document.getElementById('timers');
@@ -605,9 +604,6 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       pick.i++;
       pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
     }
-    // Metacam kommt als Erstes am Morgen, unabhängig von den Tropfen
-    var me = itemOf('meta')[0];
-    if (!state[me.id]) exp[me.id] = plannedMs(me.it);
     return exp;
   }
 
