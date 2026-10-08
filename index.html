@@ -14,10 +14,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; }
-img { max-width: 100%; }
 [hidden] { display: none !important; }
-
-/* Layout: eine schmale Spalte, Tageszeit-Abschnitte mit großen Tipp-Zeilen, Fortschritt oben */
 :root {
   --bg: #f3f6f5;
   --surface: #ffffff;
@@ -72,116 +69,96 @@ img { max-width: 100%; }
   --focus: #5fc4b8;
   color-scheme: dark;
 }
-body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.45;
-  padding-inline: 16px;
-  padding-block: 20px 40px;
-}
-.wrap { max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
-h1 { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.45; padding-inline: 16px; padding-block: 20px 40px; }
+.wrap { max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.15; margin: 0; }
 h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0; letter-spacing: 0.01em; }
 .sub { color: var(--muted); margin: 4px 0 0; font-size: 0.95rem; }
+.small { color: var(--muted); font-size: 0.9rem; }
 
-.progress { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.progress-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.count { font-family: var(--font-display); font-size: 1.3rem; font-variant-numeric: tabular-nums; }
-.count small { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); font-weight: 400; }
+.prog { display: flex; flex-direction: column; gap: 6px; }
+.prog-top { font-family: var(--font-display); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.prog-top small { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); }
 .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s ease; }
-.next { font-size: 0.95rem; color: var(--muted); margin: 0; }
-.next b { color: var(--fg); font-weight: 600; }
 
-.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--muted); }
-.legend span { display: inline-flex; align-items: center; gap: 6px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.dot.auge { background: var(--auge); } .dot.ohr { background: var(--ohr); } .dot.oral { background: var(--oral); }
-
-section { display: flex; flex-direction: column; gap: 8px; }
-.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-inline: 2px; }
-.fold { font: inherit; color: inherit; background: none; border: 0; padding: 6px 0; margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; }
-.fold .chev { width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.15s; margin-top: -3px; }
-section.folded .fold .chev { transform: rotate(-45deg); margin-top: 0; }
-section.folded .list { display: none; }
-section.folded .sec-head span.secount::after { content: ' · eingeklappt'; }
-.sec-head span { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
-
-.item { position: relative; }
-.item > input[type="checkbox"] { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
-.row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 64px; transition: background 0.15s, opacity 0.15s; }
-.box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; background: transparent; transition: background 0.15s, border-color 0.15s; }
-.box svg { width: 16px; height: 16px; opacity: 0; stroke: var(--accent-fg); }
-.item input:checked + .row .what, .item input:checked + .row .how, .item input:checked + .row .time, .item input:checked + .row .tag, .item input:checked + .row .shift { opacity: 0.6; }
-.item input:checked + .row .box { background: var(--accent); border-color: var(--accent); }
-.item input:checked + .row .box svg { opacity: 1; }
-.item input:checked + .row .what { text-decoration: line-through; text-decoration-thickness: 1px; }
-.item input:focus-visible + .row { outline: 3px solid var(--focus); outline-offset: 2px; }
-.item.is-next .row { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-
-.text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.line1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.time { font-family: var(--font-display); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.what { font-weight: 600; overflow-wrap: anywhere; }
-.how { color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
-.tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.hero { border: 2px solid var(--accent); }
+.kicker { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--accent); }
+.tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; display: inline-block; }
 .tag.auge { color: var(--auge); background: var(--auge-bg); }
 .tag.ohr { color: var(--ohr); background: var(--ohr-bg); }
 .tag.oral { color: var(--oral); background: var(--oral-bg); }
-.now { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
-
-.note { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
-.note ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 6px; }
-.note li { font-size: 0.95rem; }
-
-button.reset { font: inherit; font-weight: 600; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-height: 48px; cursor: pointer; }
-button.reset:hover { border-color: var(--muted); }
-button.reset:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.confirm p { margin: 0; flex-basis: 100%; font-size: 0.95rem; }
-button.danger { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-.lager { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.med { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.1; margin: 0; }
+.how { color: var(--muted); }
+.lager { font-weight: 600; font-size: 0.9rem; color: var(--muted); }
 .lager.no { color: var(--ohr); }
-.shift { font-size: 0.75rem; font-weight: 600; color: var(--ohr); }
-.by { font-size: 0.9rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
-.item input:disabled { cursor: default; }
-button.reset:disabled { opacity: 0.5; cursor: default; }
-.hint { border-color: var(--ohr); }
-.hint p { margin: 0; font-size: 0.95rem; }
-
-.timers { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.timer { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.big { font-family: var(--font-display); font-size: 2.4rem; font-variant-numeric: tabular-nums; line-height: 1; }
+.big.go { color: var(--accent); }
+.at { color: var(--muted); font-size: 0.95rem; }
+.btn { font: inherit; font-weight: 600; font-size: 1.05rem; border-radius: 12px; min-height: 56px; padding: 12px 18px; cursor: pointer; border: 2px solid var(--accent); background: var(--accent); color: var(--accent-fg); width: 100%; }
+.btn.wait { background: transparent; color: var(--accent); }
+.btn:disabled, button:disabled { opacity: 0.5; cursor: default; }
+.link { font: inherit; font-size: 0.9rem; color: var(--muted); background: none; border: 0; text-decoration: underline; cursor: pointer; padding: 6px 0; min-height: 36px; text-align: left; }
 .gap { margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--ohr); background: var(--ohr-bg); border-radius: 8px; padding: 8px 10px; }
-.tlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.trow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
-.trow:first-child { border-top: 0; }
-.item.skip { opacity: .55; }
-.tinfo { display: flex; flex-direction: column; min-width: 0; }
-.tname { font-weight: 600; overflow-wrap: anywhere; }
-.tsub { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
-.tcount { font-family: var(--font-display); font-size: 1.2rem; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.trow[data-state="idle"] .tcount, .trow[data-state="done"] .tcount { color: var(--muted); font-size: 1rem; font-family: var(--font-body); font-weight: 500; }
-.trow[data-state="due"] .tcount { color: var(--accent-fg); background: var(--accent); border-radius: 8px; padding: 4px 12px; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
-.setup { border-color: var(--accent); }
-.setup label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
-.setup input { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-height: 48px; width: 100%; }
-.setup input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.setup .msg { margin: 0; font-size: 0.95rem; }
-.bytxt { font-size: 0.9rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
-.byrow { position: relative; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; }
-.edit { font: inherit; font-size: 0.85rem; color: var(--muted); background: none; border: 0; text-decoration: underline; padding: 6px 0; min-height: 36px; cursor: pointer; }
-.editor { position: relative; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { flex: 1 1 28%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chip b { font-family: var(--font-display); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.chip span { font-size: 0.85rem; color: var(--muted); }
+.chip i { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; display: block; margin-top: 4px; }
+.chip u { display: block; height: 100%; background: var(--accent); text-decoration: none; }
+
+.q { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.q li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.q li:first-child { border-top: 0; }
+.n { width: 28px; height: 28px; border-radius: 50%; background: var(--line); display: grid; place-items: center; font-size: 0.8rem; font-weight: 600; }
+.q .w, .chk .w { font-weight: 600; }
+.q .t, .chk .t { color: var(--muted); font-size: 0.85rem; }
+.q .t.no, .chk .t.no { color: var(--ohr); font-weight: 600; }
+.q .e { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; text-align: right; }
+
+.chk { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.chk:first-child { border-top: 0; }
+.chk input[type="checkbox"] { width: 28px; height: 28px; accent-color: var(--accent); margin: 0; cursor: pointer; }
+.chk label { cursor: pointer; display: block; }
+.chk.done .w { text-decoration: line-through; opacity: 0.6; }
+.by { color: var(--accent); font-weight: 600; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+details summary { cursor: pointer; font-family: var(--font-display); font-size: 1.05rem; list-style: none; display: flex; justify-content: space-between; gap: 8px; min-height: 36px; align-items: center; }
+details summary::-webkit-details-marker { display: none; }
+details summary span { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); }
+.dl { margin: 8px 0 0; padding: 0; list-style: none; }
+.dl > li { padding: 10px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.dl .top { display: flex; justify-content: space-between; gap: 10px; }
+.dl .tm { font-variant-numeric: tabular-nums; color: var(--muted); }
+.acts { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.editor { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 2px; }
 .tin { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-height: 44px; font-variant-numeric: tabular-nums; }
 .tok, .tcancel { font: inherit; font-size: 0.9rem; font-weight: 600; border-radius: 10px; min-height: 44px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--fg); }
 .tok { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .editmsg { flex-basis: 100%; font-size: 0.85rem; color: var(--ohr); font-weight: 600; }
-.edit:focus-visible, .tin:focus-visible, .tok:focus-visible, .tcancel:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.link:focus-visible, .tin:focus-visible, .tok:focus-visible, .tcancel:focus-visible, .btn:focus-visible, summary:focus-visible, .chk input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.note ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 6px; }
+.note li { font-size: 0.95rem; }
+.hint { border-color: var(--ohr); }
+.hint p { margin: 0; font-size: 0.95rem; }
+button.reset { font: inherit; font-weight: 600; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-height: 48px; cursor: pointer; }
+button.reset:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.confirm p { margin: 0; flex-basis: 100%; font-size: 0.95rem; }
+button.danger { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.setup { border-color: var(--accent); }
+.setup label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+.setup input { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-height: 48px; width: 100%; }
+.setup .msg { margin: 0; font-size: 0.95rem; }
 .linkbtn { font: inherit; font-size: 0.9rem; color: var(--muted); background: none; border: 0; text-decoration: underline; padding: 12px 4px; min-height: 44px; cursor: pointer; align-self: center; }
-.linkbtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -201,35 +178,14 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     <button class="reset danger" id="setupGo" type="button">Speichern</button>
   </div>
 
-  <div class="progress" aria-live="polite">
-    <div class="progress-top">
-      <div class="count"><span id="done">0</span> von <span id="total">17</span> <small>Gaben heute</small></div>
-    </div>
-    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><i id="barfill"></i></div>
-    <p class="next" id="next"></p>
-  </div>
-
-  <div class="timers"><h2>Nächste Gabe</h2><p class="gap" id="gap" hidden></p><ul class="tlist" id="timers"></ul></div>
-
   <div class="note hint" id="hinweis" hidden><p></p></div>
 
-  <div class="legend" aria-label="Legende">
-    <span><i class="dot auge"></i>Auge links</span>
-    <span><i class="dot ohr"></i>Ohr</span>
-    <span><i class="dot oral"></i>Zum Einnehmen</span>
+  <div class="prog" aria-live="polite">
+    <div class="prog-top"><span id="done">0</span> von <span id="total">17</span> <small>Gaben heute</small></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><i id="barfill"></i></div>
   </div>
 
-  <div id="sections"></div>
-
-  <section>
-    <div class="sec-head"><h2>Ohne Uhrzeit</h2><span class="secount" id="earcount"></span></div>
-    <ul class="list" id="ear"></ul>
-  </section>
-
-  <section>
-    <div class="sec-head"><h2>Einmalig</h2></div>
-    <ul class="list" id="once"></ul>
-  </section>
+  <div id="app" style="display:flex;flex-direction:column;gap:16px"></div>
 
   <div class="note">
     <h2>Zum Beachten</h2>
@@ -244,204 +200,165 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   <div id="resetbox"></div>
   <button class="linkbtn" id="cfgbtn" type="button">Name oder Code ändern</button>
 </div>
-
 <script>
-
 (function () {
-  var plan = [
-    { title: 'Vormittag', items: [
-      { id: 's0i0', t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { id: 's0i1', t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { id: 's0i2', t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
-    ]},
-    { title: 'Mittag', items: [
-      { t: '12:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { t: '14:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { t: '14:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
-    ]},
-    { title: 'Nachmittag', items: [
-      { t: '15:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { t: '17:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' }
-    ]},
-    { title: 'Abend', items: [
-      { t: '18:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { t: '18:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
-      { t: '20:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { t: '22:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { t: '22:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
-      { t: '22:45', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
-    ]}
+  var MEDS = {
+    rego: { n: 'Regoculan', k: 'auge', tag: 'Auge links', h: '1 Tropfen', l: 'Im Kühlschrank lagern', tot: 6 },
+    cef:  { n: 'Cefenicol', k: 'auge', tag: 'Auge links', h: '1 Tropfen', l: 'Im Kühlschrank lagern', tot: 4 },
+    stro: { n: 'Stromease', k: 'auge', tag: 'Auge links', h: '1 Tropfen', l: 'NICHT im Kühlschrank lagern', tot: 4 }
+  };
+  // Reihenfolge der Augentropfen-Gaben (IDs bleiben wie bisher, damit gespeicherte Haken passen)
+  var DOSES = [
+    { id: 's0i0', m: 'rego' }, { id: 's0i1', m: 'cef' }, { id: 's0i2', m: 'stro' },
+    { id: 's1i0', m: 'rego' }, { id: 's1i1', m: 'cef' }, { id: 's1i2', m: 'stro' },
+    { id: 's2i0', m: 'rego' }, { id: 's2i1', m: 'rego' },
+    { id: 's3i0', m: 'cef' }, { id: 's3i1', m: 'stro' }, { id: 's3i2', m: 'rego' },
+    { id: 's3i3', m: 'cef' }, { id: 's3i4', m: 'rego' }, { id: 's3i5', m: 'stro' }
   ];
-  var ear = [
-    { id: 's0i4', w: 'Metacam', h: 'Als Erstes am Morgen, Menge laut Etikett', k: 'oral', tag: 'Oral' },
-    { id: 's0i3', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts' },
-    { id: 's0i5', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts' }
+  var OTHER = [
+    { id: 's0i4', n: 'Metacam', k: 'oral', tag: 'Oral', h: 'Als Erstes am Morgen, Menge laut Etikett' },
+    { id: 's0i3', n: 'Auris Ohrreiniger', k: 'ohr', tag: 'Ohr rechts', h: 'Ohr fluten, danach 1 Minute massieren' },
+    { id: 's0i5', n: 'Baytril-Ohrlösung', k: 'ohr', tag: 'Ohr rechts', h: '1 ml, eine Stunde nach der Spülung', after: 's0i3' }
   ];
-  var once = [{ id: 'einmal-ohr-links', w: 'Linkes Ohr spülen', h: 'Einmalig, mit Auris Ohrreiniger', k: 'ohr', tag: 'Ohr links' }];
+  var ONCE = [{ id: 'einmal-ohr-links', n: 'Linkes Ohr spülen', k: 'ohr', tag: 'Ohr links', h: 'Einmalig, mit Auris Ohrreiniger' }];
+  var GAP = 15 * 60000;
+  var byId = {};
+  DOSES.forEach(function (d) { byId[d.id] = { n: MEDS[d.m].n }; });
+  OTHER.concat(ONCE).forEach(function (o) { byId[o.id] = { n: o.n }; });
 
   function todayKey() {
     var n = new Date();
     return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
   }
   var dayKey = todayKey();
-
-  // state: item id -> true (lokal) oder {by, at} (geteilt)
   var state = {};
-  var mode = 'db';      // 'local' oder 'db'
-  var readOnly = false;
-  var db = null, user = null, myId = null, unsub = null;
-  var names = {};          // user id -> Anzeigename
-  var chain = {};          // item id -> Promise (ein Schreibvorgang pro Dokument)
-  var localDay = {}, localOnce = {};
+  var editing = null, editMsgTxt = '';
+  var doneOpen = false;
+  var lastSig = '';
 
   var hint = document.getElementById('hinweis');
   function showHint(msg) {
     if (msg) { hint.querySelector('p').textContent = msg; hint.hidden = false; }
     else { hint.hidden = true; }
   }
-
-  function lget(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
-  function lset(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-
   function setDatum() {
-    try {
-      document.getElementById('datum').textContent = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    } catch (e) {}
+    try { document.getElementById('datum').textContent = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) {}
   }
   setDatum();
 
-  var check = '<svg viewBox="0 0 16 16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
-  var LAGER = { rego: 'Im Kühlschrank lagern', cef: 'Im Kühlschrank lagern', stro: 'NICHT im Kühlschrank lagern' };
-  function rowHtml(id, it, withTime) {
-    var lg = it.m && LAGER[it.m] ? '<span class="lager' + (it.m === 'stro' ? ' no' : '') + '">' + LAGER[it.m] + '</span>' : '';
-    return '<li class="item" data-id="' + id + '">' +
-      '<input type="checkbox" id="c-' + id + '" aria-label="' + (withTime ? it.t + ' Uhr, ' : '') + it.w + ', ' + it.tag + '">' +
-      '<div class="row"><span class="box">' + check + '</span><span class="text">' +
-      '<span class="line1">' + (withTime ? '<span class="time">' + it.t + '</span><span class="shift" hidden></span>' : '') +
-      '<span class="tag ' + it.k + '">' + it.tag + '</span><span class="now" hidden>Als Nächstes</span></span>' +
-      '<span class="what">' + it.w + '</span><span class="how">' + it.h + '</span>' + lg +
-      '<span class="byrow" hidden><span class="bytxt"></span><button class="edit" type="button">Zeit ändern</button></span>' +
-      '<span class="editor" hidden><input class="tin" type="time" aria-label="Uhrzeit"><button class="tok" type="button">Speichern</button><button class="tcancel" type="button">Abbrechen</button><span class="editmsg" hidden></span></span></span></div></li>';
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function hm(ms) { var x = new Date(ms); return pad(x.getHours()) + ':' + pad(x.getMinutes()); }
+  function cd(ms) {
+    var s = Math.max(0, Math.round(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60;
+    return h > 0 ? h + ' Std. ' + pad(m) + ' Min.' : pad(m) + ':' + pad(r) + ' Min.';
+  }
+  function stamp(id) {
+    var s = state[id];
+    var t = s && typeof s === 'object' && s.at ? Date.parse(s.at) : NaN;
+    return isNaN(t) ? null : t;
+  }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function who(id) { var s = state[id]; return s && s.by ? (s.by === myName ? 'Du' : s.by) : ''; }
+
+  function lastEye() {
+    var last = null, id = null;
+    DOSES.forEach(function (d) {
+      var t = state[d.id] ? stamp(d.id) : null;
+      if (t !== null && (last === null || t > last)) { last = t; id = d.id; }
+    });
+    return last === null ? null : { at: last, id: id };
+  }
+  function queue() { return DOSES.filter(function (d) { return !state[d.id]; }); }
+
+  // ---------- Darstellung ----------
+  function editorHtml(id) {
+    var s = state[id];
+    var v = s && typeof s === 'object' && s.at ? hm(Date.parse(s.at)) : hm(Date.now());
+    return '<div class="editor" data-ed="' + id + '"><input class="tin" type="time" value="' + v + '" aria-label="Uhrzeit"><button class="tok" type="button" data-act="save" data-id="' + id + '">Speichern</button><button class="tcancel" type="button" data-act="cancel">Abbrechen</button>' +
+      (editMsgTxt ? '<span class="editmsg">' + esc(editMsgTxt) + '</span>' : '') + '</div>';
   }
 
-  var all = [];
-  var html = '';
-  plan.forEach(function (sec, si) {
-    var list = '';
-    sec.items.forEach(function (it, ii) {
-      var id = it.id || ('s' + si + 'i' + ii);
-      all.push({ id: id, it: it, si: si });
-      list += rowHtml(id, it, true);
-    });
-    html += '<section data-sec="' + si + '"><div class="sec-head"><h2><button class="fold" type="button" aria-expanded="true">' + sec.title + '<i class="chev"></i></button></h2><span class="secount"></span></div><ul class="list">' + list + '</ul></section>';
-  });
-  document.getElementById('sections').innerHTML = '<div style="display:flex;flex-direction:column;gap:20px">' + html + '</div>';
-  document.getElementById('once').innerHTML = once.map(function (o) { return rowHtml(o.id, o, false); }).join('');
-  document.getElementById('ear').innerHTML = ear.map(function (o) { return rowHtml(o.id, o, false); }).join('');
-  document.getElementById('total').textContent = all.length + ear.length;
+  function render(force) {
+    if (editing && !force) return;
+    var q = queue(), le = lastEye(), now = Date.now(), h = '';
+    var due = le ? le.at + GAP : now, wait = due - now;
+    var cnt = {};
+    DOSES.forEach(function (d) { if (state[d.id]) cnt[d.m] = (cnt[d.m] || 0) + 1; });
 
-  function fmtTime(iso) {
-    try { return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
-  }
-
-  var editing = null;
-  var folds = {};
-  try { folds = JSON.parse(localStorage.getItem('hundeplan-fold') || '{}') || {}; } catch (e) { folds = {}; }
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('.fold');
-    if (!b) return;
-    var sec = b.closest('section'), si = sec.getAttribute('data-sec');
-    var nowFolded = !sec.classList.contains('folded');
-    folds[si] = { v: nowFolded, auto: sec.getAttribute('data-closed') === '1' };
-    try { localStorage.setItem('hundeplan-fold', JSON.stringify(folds)); } catch (er) {}
-    apply();
-  });
-  function applyBy() {
-    var ids = all.map(function (a) { return a.id; }).concat(ear.map(function (o) { return o.id; })).concat(once.map(function (o) { return o.id; }));
-    ids.forEach(function (id) {
-      var li = document.querySelector('[data-id="' + id + '"]');
-      var row = li.querySelector('.byrow'), txt = li.querySelector('.bytxt'), ed = li.querySelector('.editor');
-      var s = state[id];
-      if (!s) {
-        txt.textContent = '';
-        row.hidden = true;
-        ed.hidden = editing !== id;
-        return;
-      }
-      if (typeof s === 'object') {
-        var who = s.by ? (s.by === myName ? 'Du' : s.by) : '';
-        var tm = s.at ? fmtTime(s.at) : '';
-        txt.textContent = (tm ? 'Gegeben um ' + tm + ' Uhr' : 'Erledigt') + (who ? ' · ' + who : '');
-      } else {
-        txt.textContent = 'Erledigt';
-      }
-      row.hidden = editing === id;
-      ed.hidden = editing !== id;
-    });
-  }
-
-  function resolveNames() { return; }
-
-  function apply() {
-    var done = 0, nextItem = null, sk = skippedSet();
-    all.forEach(function (a) {
-      var el = document.querySelector('[data-id="' + a.id + '"]');
-      var cb = el.querySelector('input');
-      cb.checked = !!state[a.id];
-      cb.disabled = readOnly;
-      if (cb.checked) done++; else if (!nextItem && !sk[a.id]) nextItem = a;
-      el.classList.remove('is-next');
-      el.classList.toggle('skip', !!sk[a.id]);
-      el.querySelector('.now').hidden = true;
-    });
-    if (nextItem) {
-      var ne = document.querySelector('[data-id="' + nextItem.id + '"]');
-      ne.classList.add('is-next');
-      ne.querySelector('.now').hidden = false;
-      document.getElementById('next').innerHTML = 'Als Nächstes: <b>' + nextItem.it.t + ' Uhr, ' + nextItem.it.w + '</b>';
+    if (!q.length) {
+      h += '<div class="card hero"><span class="kicker">Geschafft</span><h2 class="med">Alle Augentropfen für heute gegeben</h2></div>';
     } else {
-      document.getElementById('next').innerHTML = '<b>Alles für heute erledigt.</b>';
+      var d0 = q[0], m = MEDS[d0.m];
+      h += '<div class="card hero"><span class="kicker" id="kick">' + (wait > 0 ? 'Gleich dran' : 'Jetzt dran') + '</span>' +
+        '<div><span class="tag ' + m.k + '">' + m.tag + '</span></div><h2 class="med">' + m.n + '</h2><div class="how">' + m.h + '</div>' +
+        '<div class="lager' + (d0.m === 'stro' ? ' no' : '') + '">' + m.l + '</div>' +
+        '<div class="timer"><span class="big' + (wait > 0 ? '' : ' go') + '" id="big">' + (wait > 0 ? cd(wait) : 'Jetzt') + '</span><span class="at" id="at">' +
+        (wait > 0 ? 'ab ' + hm(due) + ' Uhr' : (le ? 'seit ' + hm(due) + ' Uhr möglich' : '')) + '</span></div>' +
+        (le && wait > 0 ? '<p class="gap" id="gapmsg">15 Minuten Abstand zur letzten Gabe (' + esc(byId[le.id].n) + ' um ' + hm(le.at) + ' Uhr)</p>' : '') +
+        '<button class="btn' + (wait > 0 ? ' wait' : '') + '" type="button" data-act="give">' + (wait > 0 ? 'Trotzdem jetzt gegeben' : 'Gegeben') + '</button>' +
+        (editing === 'new' ? editorHtml('new') : '<button class="link" type="button" data-act="other">Mit anderer Uhrzeit eintragen</button>') + '</div>';
+      if (q.length > 1) {
+        h += '<div class="card"><h2>Danach</h2><ul class="q">';
+        var t = Math.max(due, now);
+        q.slice(1, 4).forEach(function (d, i) {
+          t += GAP;
+          h += '<li><span class="n">' + (i + 2) + '</span><span><span class="w">' + MEDS[d.m].n + '</span><br><span class="t' + (d.m === 'stro' ? ' no' : '') + '">' + MEDS[d.m].l + '</span></span><span class="e">frühestens<br>ca. ' + hm(t) + '</span></li>';
+        });
+        h += '</ul><span class="small">Danach noch ' + Math.max(0, q.length - 4) + ' weitere Gaben. Die Uhrzeiten rechnen sich nach jeder Gabe neu.</span></div>';
+      }
     }
-    var earDone = 0;
-    ear.forEach(function (o) {
-      var cb = document.getElementById('c-' + o.id);
-      cb.checked = !!state[o.id];
-      cb.disabled = readOnly;
-      if (cb.checked) earDone++;
-    });
-    document.getElementById('earcount').textContent = earDone + ' von ' + ear.length;
-    done += earDone;
-    var total = all.length + ear.length;
+
+    h += '<div class="chips">' + Object.keys(MEDS).map(function (k) {
+      var c = cnt[k] || 0, tot = MEDS[k].tot;
+      return '<div class="chip"><span>' + MEDS[k].n + '</span><b>' + c + ' von ' + tot + '</b><i><u style="width:' + (c / tot * 100) + '%"></u></i></div>';
+    }).join('') + '</div>';
+
+    function otherRow(o) {
+      var dn = !!state[o.id], extra = '';
+      if (dn) {
+        var tm = stamp(o.id);
+        extra = '<span class="by">' + (tm !== null ? 'Gegeben um ' + hm(tm) + ' Uhr' : 'Erledigt') + (who(o.id) ? ' · ' + esc(who(o.id)) : '') + '</span> ';
+        extra += editing === o.id ? editorHtml(o.id) : '<button class="link" type="button" data-act="edit" data-id="' + o.id + '">Zeit ändern</button>';
+      } else if (o.after && state[o.after] && stamp(o.after) !== null) {
+        extra = '<span class="small">Frühestens um ' + hm(stamp(o.after) + 3600000) + ' Uhr (1 Std. nach der Spülung)</span>';
+      }
+      return '<div class="chk' + (dn ? ' done' : '') + '"><input type="checkbox" id="o-' + o.id + '" data-o="' + o.id + '"' + (dn ? ' checked' : '') + '><div><label for="o-' + o.id + '"><span class="tag ' + o.k + '">' + o.tag + '</span><br><span class="w">' + o.n + '</span><br><span class="t">' + o.h + '</span></label>' + (extra ? '<div>' + extra + '</div>' : '') + '</div></div>';
+    }
+    h += '<div class="card"><h2>Ohne Uhrzeit</h2><div>' + OTHER.map(otherRow).join('') + '</div></div>';
+    h += '<div class="card"><h2>Einmalig</h2><div>' + ONCE.map(otherRow).join('') + '</div></div>';
+
+    var gv = DOSES.filter(function (d) { return state[d.id]; }).sort(function (a, b) { return (stamp(b.id) || 0) - (stamp(a.id) || 0); });
+    h += '<div class="card"><details id="dd"' + (doneOpen ? ' open' : '') + '><summary>Erledigt heute <span>' + gv.length + ' Gaben</span></summary><ul class="dl">' +
+      gv.map(function (d) {
+        var tm = stamp(d.id);
+        return '<li><div class="top"><span>' + MEDS[d.m].n + (who(d.id) ? ' <span class="small">· ' + esc(who(d.id)) + '</span>' : '') + '</span><span class="tm">' + (tm !== null ? hm(tm) + ' Uhr' : 'erledigt') + '</span></div>' +
+          (editing === d.id ? editorHtml(d.id) : '<div class="acts"><button class="link" type="button" data-act="edit" data-id="' + d.id + '">Zeit ändern</button><button class="link" type="button" data-act="undo" data-id="' + d.id + '">Zurücknehmen</button></div>') + '</li>';
+      }).join('') + '</ul></details></div>';
+
+    var sig = h;
+    var app = document.getElementById('app');
+    if (force || sig !== lastSig) { app.innerHTML = h; lastSig = sig; }
+    var total = DOSES.length + OTHER.length;
+    var done = DOSES.filter(function (d) { return state[d.id]; }).length + OTHER.filter(function (o) { return state[o.id]; }).length;
+    document.getElementById('total').textContent = total;
     document.getElementById('done').textContent = done;
     var pct = Math.round(done / total * 100);
     document.getElementById('barfill').style.width = pct + '%';
     document.getElementById('bar').setAttribute('aria-valuenow', pct);
-    plan.forEach(function (sec, si) {
-      var d = 0;
-      sec.items.forEach(function (it, ii) { if (state[it.id || ('s' + si + 'i' + ii)]) d++; });
-      document.querySelector('[data-sec="' + si + '"] .secount').textContent = d + ' von ' + sec.items.length;
-      var closed = sec.items.every(function (it, ii) { var id = it.id || ('s' + si + 'i' + ii); return state[id] || sk[id]; });
-      var ov = folds[si];
-      var folded = ov && ov.auto === closed ? ov.v : closed;
-      var secEl = document.querySelector('[data-sec="' + si + '"]');
-      secEl.classList.toggle('folded', folded);
-      secEl.style.order = closed ? 1 : 0;
-      secEl.querySelector('.fold').setAttribute('aria-expanded', folded ? 'false' : 'true');
-      secEl.setAttribute('data-closed', closed ? '1' : '0');
-    });
-    once.forEach(function (o) {
-      var cb = document.getElementById('c-' + o.id);
-      cb.checked = !!state[o.id];
-      cb.disabled = readOnly;
-    });
-    applyBy();
-    resolveNames();
-    renderTimers();
-    var rb = document.getElementById('r1');
-    if (rb) rb.disabled = readOnly;
+    var rb = document.getElementById('r1'); if (rb) rb.disabled = false;
   }
 
-  // ---------- Verbindung zur Datenbank ----------
+  // Timer läuft jede Sekunde, ohne die Karte neu zu bauen
+  function tick() {
+    if (todayKey() !== dayKey) { dayKey = todayKey(); setDatum(); state = {}; editing = null; render(true); poll(); return; }
+    var big = document.getElementById('big');
+    if (!big) return;
+    var le = lastEye(), due = le ? le.at + GAP : Date.now(), wait = due - Date.now();
+    if (wait > 0) { var t = cd(wait); if (big.textContent !== t) big.textContent = t; }
+    else if (big.textContent !== 'Jetzt') render(true);
+  }
+  setInterval(tick, 1000);
+
   var SUPA_URL = 'https://vdflmmdmezaersrssdci.supabase.co';
   var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkZmxtbWRtZXphZXJzcnNzZGNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2NDUwMDMsImV4cCI6MjEwNDIyMTAwM30.AlDPAJqVvM_fLlrmzyBNgj4wFzRe_jDnChkTUi6ZH84';
   var myName = '', code = '', inflight = 0, pollTimer = null;
@@ -497,21 +414,20 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     showHint('Keine Verbindung. Die Liste aktualisiert sich, sobald es wieder klappt.');
   }
 
+
   function poll() {
     if (!code || !myName || inflight > 0 || document.visibilityState === 'hidden') return Promise.resolve();
     return rpc('hundeplan_get', { p_code: code, p_days: [dayKey, 'einmalig'] }).then(function (rows) {
       if (inflight > 0) return;
       state = parseState(rows);
       showHint('');
-      apply();
+      render();
     }, handleNetError);
   }
-
   function start() {
     poll();
     if (!pollTimer) pollTimer = setInterval(poll, 5000);
   }
-
   function dbSet(id, checked, atIso, byName) {
     var isOnce = id.indexOf('einmal') === 0;
     var day = isOnce ? 'einmalig' : dayKey;
@@ -524,299 +440,101 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     });
     return chain[id];
   }
+  var chain = {};
 
-  document.addEventListener('change', function (e) {
-    if (!e.target.matches || !e.target.matches('input[type="checkbox"]')) return;
-    var li = e.target.closest && e.target.closest('.item');
-    if (!li) return;
-    if (!code || !myName) {
-      e.target.checked = !e.target.checked;
-      showSetup('Bitte zuerst Namen und Familiencode eintragen.');
-      return;
-    }
-    var id = li.getAttribute('data-id');
-    var checked = e.target.checked;
-    if (checked && li.classList.contains('skip')) {
-      // Nachtragen: erst die Uhrzeit abfragen, damit der Plan nicht neu startet
-      e.target.checked = false;
-      var item = all.filter(function (a) { return a.id === id; })[0];
-      var tin = li.querySelector('.tin');
-      tin.value = hhmm(new Date(Math.min(plannedMs(item.it), Date.now())).toISOString());
-      editing = id;
-      editMsg(li, '');
-      applyBy();
-      tin.focus();
-      return;
-    }
-    if (checked) state[id] = { by: myName, at: new Date().toISOString() }; else delete state[id];
-    apply();
-    dbSet(id, checked);
-  });
-
-  // ---------- Zurücksetzen ----------
-  var box = document.getElementById('resetbox');
-  function showReset() {
-    box.innerHTML = '<button class="reset" id="r1" type="button">Heute zurücksetzen</button>';
-    document.getElementById('r1').disabled = readOnly;
-    document.getElementById('r1').onclick = showConfirm;
+  function needSetup() {
+    if (!code || !myName) { showSetup('Bitte zuerst Namen und Familiencode eintragen.'); return true; }
+    return false;
   }
-  function showConfirm() {
-    box.innerHTML = '<div class="confirm"><p>Alle Haken von heute für alle entfernen?</p><button class="reset danger" id="r2" type="button">Ja, zurücksetzen</button><button class="reset" id="r3" type="button">Abbrechen</button></div>';
-    document.getElementById('r2').onclick = function () {
-      all.concat(ear).forEach(function (a) { if (state[a.id]) { delete state[a.id]; dbSet(a.id, false); } });
-      apply();
-      showReset();
-    };
-    document.getElementById('r3').onclick = showReset;
+  function setDone(id, atMs) {
+    var iso = new Date(atMs).toISOString();
+    state[id] = { by: myName, at: iso };
+    render(true);
+    dbSet(id, true, iso);
   }
-  showReset();
-
-
-  // ---------- Timer pro Medikament ----------
-  var meds = [
-    { m: 'rego', name: 'Regoculan', k: 'auge', every: 150, note: 'alle 2,5 Std.' },
-    { m: 'cef', name: 'Cefenicol', k: 'auge', every: 240, note: 'alle 4 Std.' },
-    { m: 'stro', name: 'Stromease', k: 'auge', every: 240, note: 'alle 4 Std.' }
-  ];
-  var EYE_GAP_MIN = 15;
-  var tl = document.getElementById('timers');
-  tl.innerHTML = meds.map(function (md) {
-    return '<li class="trow" data-m="' + md.m + '"><i class="dot ' + md.k + '"></i>' +
-      '<div class="tinfo"><span class="tname">' + md.name + '</span><span class="tsub"></span></div>' +
-      '<span class="tcount"></span></li>';
-  }).join('');
-
-  function fmtCount(ms) {
-    var sec = Math.max(0, Math.round(ms / 1000));
-    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), r = sec % 60;
-    if (h > 0) return h + ' Std. ' + String(m).padStart(2, '0') + ' Min.';
-    return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0') + ' Min.';
-  }
-  function stamp(id) {
-    var s = state[id];
-    var t = s && typeof s === 'object' && s.at ? Date.parse(s.at) : NaN;
-    return isNaN(t) ? null : t;
-  }
-  function setText(el, txt) { if (el.textContent !== txt) el.textContent = txt; }
-
-  function clock(ms) {
-    var d = new Date(ms);
-    var txt = fmtTime(d.toISOString());
-    var base = new Date(dayKey + 'T00:00:00');
-    return txt;
-  }
-  function plannedMs(it) { return Date.parse(dayKey + 'T' + it.t + ':00'); }
-  // Wurde schon in einem späteren Abschnitt eine Augentropfen-Gabe abgehakt, gelten offene Gaben davor als übersprungen
-  function skippedSet() {
-    var pos = -1, sk = {};
-    all.forEach(function (a) { if (state[a.id] && a.it.k === 'auge' && a.si > pos) pos = a.si; });
-    all.forEach(function (a) { if (!state[a.id] && a.it.k === 'auge' && a.si < pos) sk[a.id] = true; });
-    return sk;
-  }
-  function eod() { return Date.parse(dayKey + 'T23:59:00'); }
-  function itemOf(m) { return all.filter(function (a) { return a.it.m === m; }); }
-
-  // Erwartete Zeit je offener Gabe, abgeleitet aus den echten Abhak-Zeiten
-  function buildSchedule() {
-    var nowMs = Date.now();
-    var nowUp = Math.ceil(nowMs / 60000) * 60000;
-    var GAP = EYE_GAP_MIN * 60000;
-    var exp = {};
-    var sk = skippedSet();
-    var eyeMeds = meds.filter(function (m) { return m.k === 'auge'; });
-    var lastEye = null, st = {};
-    eyeMeds.forEach(function (md) {
-      var items = itemOf(md.m);
-      var pending = items.filter(function (a) { return !state[a.id] && !sk[a.id]; });
-      var last = null;
-      items.forEach(function (a) {
-        if (!state[a.id]) return;
-        var t = stamp(a.id);
-        if (t === null) return;
-        if (last === null || t > last) last = t;
-        if (lastEye === null || t > lastEye) lastEye = t;
-      });
-      st[md.m] = { md: md, pending: pending, i: 0,
-        next: pending.length ? plannedMs(pending[0].it) : null };
-    });
-    var prevEnd = lastEye !== null ? lastEye + GAP : -Infinity;
-    for (;;) {
-      var pick = null;
-      eyeMeds.forEach(function (md) {
-        var x = st[md.m];
-        if (x.next !== null && x.i < x.pending.length && (pick === null || x.next < pick.next)) pick = x;
-      });
-      if (!pick) break;
-      var slot = Math.max(pick.next, prevEnd);
-      exp[pick.pending[pick.i].id] = slot;
-      var eff = Math.max(slot, nowUp);
-      prevEnd = eff + GAP;
-      pick.i++;
-      pick.next = pick.i < pick.pending.length ? plannedMs(pick.pending[pick.i].it) : null;
-    }
-    // Der Plan gilt nur für diesen Tag: nichts wird nach 23:59 angezeigt
-    var endOfDay = eod();
-    Object.keys(exp).forEach(function (k) { if (exp[k] > endOfDay) exp[k] = endOfDay; });
-    return exp;
+  function parseTime(v) {
+    if (!/^\d{2}:\d{2}$/.test(v)) return { err: 'Bitte eine Uhrzeit eintragen.' };
+    var ms = Date.parse(dayKey + 'T' + v + ':00');
+    if (isNaN(ms)) return { err: 'Diese Uhrzeit ist ungültig.' };
+    if (ms > Date.now() + 60000) return { err: 'Die Uhrzeit liegt in der Zukunft.' };
+    return { ms: ms };
   }
 
-  function renderTimers() {
-    var nowMs = Date.now();
-    if (todayKey() !== dayKey) { dayKey = todayKey(); setDatum(); state = {}; editing = null; apply(); poll(); return; }
-    var exp = buildSchedule();
-    var sk = skippedSet();
-    var eyeLast = null;
-
-    // Uhrzeiten in der Liste
-    all.forEach(function (a) {
-      var li = document.querySelector('[data-id="' + a.id + '"]');
-      if (!li) return;
-      var te = li.querySelector('.time'), sh = li.querySelector('.shift');
-      if (!te || !sh) return;
-      li.classList.toggle('skip', !!sk[a.id]);
-      if (sk[a.id]) {
-        setText(te, a.it.t);
-        setText(sh, 'übersprungen · antippen zum Nachtragen'); sh.hidden = false;
-      } else if (!state[a.id] && exp[a.id] !== undefined && exp[a.id] >= eod()) {
-        setText(te, a.it.t);
-        setText(sh, 'heute nicht mehr'); sh.hidden = false;
-      } else if (state[a.id] || exp[a.id] === undefined) {
-        setText(te, a.it.t);
-        sh.hidden = true;
-      } else {
-        var txt = clock(exp[a.id]);
-        setText(te, txt);
-        if (txt !== a.it.t) { setText(sh, 'statt ' + a.it.t); sh.hidden = false; } else { sh.hidden = true; }
-      }
-    });
-
-    // Timer je Medikament, das früheste zuerst
-    var order = [];
-    meds.forEach(function (md) {
-      var row = tl.querySelector('[data-m="' + md.m + '"]');
-      var items = itemOf(md.m).filter(function (a) { return !sk[a.id]; });
-      var givenItems = items.filter(function (a) { return state[a.id]; });
-      var last = null;
-      givenItems.forEach(function (a) { var t = stamp(a.id); if (t !== null && (last === null || t > last)) last = t; });
-      if (md.k === 'auge' && last !== null && (eyeLast === null || last > eyeLast)) eyeLast = last;
-
-      var cnt = '', sub = '', cls = '', due0 = null;
-      var multi = items.length > 1;
-      var left = items.length - givenItems.length;
-      var tail = multi ? ' · noch ' + left + ' heute' : '';
-
-      if (givenItems.length >= items.length) {
-        cnt = 'Fertig'; cls = 'done';
-        sub = multi ? 'Heute alle ' + items.length + ' Gaben erledigt' : 'Heute erledigt';
-      } else {
-        var first = items.filter(function (a) { return !state[a.id]; })[0];
-        var due = exp[first.id];
-        var diff = due - nowMs;
-        due0 = due;
-        if (due >= eod()) {
-          cnt = 'Offen'; cls = 'idle';
-          sub = 'Heute nicht mehr' + tail;
-        } else if (givenItems.length > 0 || diff <= 60 * 60000) {
-          if (diff > 0) {
-            cnt = fmtCount(diff); cls = 'wait';
-            sub = 'Nächste Gabe um ' + clock(due) + ' Uhr' + tail;
-          } else {
-            var over = Math.floor(-diff / 60000);
-            cnt = 'Jetzt'; cls = 'due';
-            sub = (over < 1 ? 'Gerade fällig' : 'Seit ' + over + ' Min. fällig') + tail;
-          }
-        } else {
-          cnt = 'Offen'; cls = 'idle';
-          sub = 'Geplant: ' + clock(due) + ' Uhr' + tail;
-        }
-      }
-      order.push({ row: row, key: cls === 'done' ? Infinity : (due0 === null ? Infinity : due0) });
-      setText(row.querySelector('.tcount'), cnt);
-      setText(row.querySelector('.tsub'), sub);
-      if (row.getAttribute('data-state') !== cls) row.setAttribute('data-state', cls);
-    });
-
-    var nx = null;
-    all.forEach(function (a) { if (!nx && !state[a.id] && !sk[a.id] && exp[a.id] !== undefined && exp[a.id] < eod()) nx = a; });
-    if (nx) {
-      var nextEl = document.getElementById('next');
-      var nh = 'Als Nächstes: <b>' + clock(exp[nx.id]) + ' Uhr, ' + nx.it.w + '</b>';
-      if (nextEl.innerHTML !== nh) nextEl.innerHTML = nh;
-    }
-    order.sort(function (a, b) { return a.key - b.key; });
-    order.forEach(function (o, i) { if (tl.children[i] !== o.row) tl.insertBefore(o.row, tl.children[i] || null); });
-
-    var gap = document.getElementById('gap');
-    var gapLeft = eyeLast !== null ? eyeLast + EYE_GAP_MIN * 60000 - nowMs : 0;
-    if (gapLeft > 0) {
-      setText(gap, 'Augentropfen-Abstand: Der nächste Tropfen ist in ' + fmtCount(gapLeft) + ' erlaubt.');
-      gap.hidden = false;
-    } else {
-      gap.hidden = true;
-    }
-  }
-  setInterval(renderTimers, 1000);
-
-  // ---------- Uhrzeit nachträglich ändern ----------
-  function hhmm(iso) {
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-  }
-  function editMsg(li, msg) {
-    var m = li.querySelector('.editmsg');
-    m.textContent = msg || '';
-    m.hidden = !msg;
-  }
   document.addEventListener('click', function (e) {
-    var t = e.target;
-    var li = t.closest && t.closest('.item');
-    if (!li) return;
-    var id = li.getAttribute('data-id');
-    if (t.classList.contains('edit')) {
-      var s = state[id];
-      editing = id;
-      editMsg(li, '');
-      li.querySelector('.tin').value = (s && typeof s === 'object' && s.at) ? hhmm(s.at) : '';
-      applyBy();
-      li.querySelector('.tin').focus();
-    } else if (t.classList.contains('tcancel')) {
-      editing = null;
-      applyBy();
-    } else if (t.classList.contains('tok')) {
-      var v = li.querySelector('.tin').value;
-      if (!/^\d{2}:\d{2}$/.test(v)) { editMsg(li, 'Bitte eine Uhrzeit eintragen.'); return; }
-      var ms = Date.parse(dayKey + 'T' + v + ':00');
-      if (isNaN(ms)) { editMsg(li, 'Diese Uhrzeit ist ungültig.'); return; }
-      if (ms > Date.now() + 60000) { editMsg(li, 'Die Uhrzeit liegt in der Zukunft.'); return; }
-      var cur = state[id];
-      var by = cur && typeof cur === 'object' && cur.by ? cur.by : myName;
-      var iso = new Date(ms).toISOString();
-      state[id] = { by: by, at: iso };
-      editing = null;
-      apply();
-      dbSet(id, true, iso, by);
+    var b = e.target.closest && e.target.closest('[data-act]');
+    if (!b) return;
+    var act = b.getAttribute('data-act'), id = b.getAttribute('data-id');
+    if (act === 'give') {
+      if (needSetup()) return;
+      var q = queue(); if (!q.length) return;
+      setDone(q[0].id, Date.now());
+    } else if (act === 'other') {
+      editing = 'new'; editMsgTxt = ''; render(true);
+      var t = document.querySelector('[data-ed="new"] .tin'); if (t) t.focus();
+    } else if (act === 'edit') {
+      editing = id; editMsgTxt = ''; render(true);
+      var t2 = document.querySelector('[data-ed="' + id + '"] .tin'); if (t2) t2.focus();
+    } else if (act === 'cancel') {
+      editing = null; editMsgTxt = ''; render(true);
+    } else if (act === 'undo') {
+      if (needSetup()) return;
+      if (!window.confirm('Diese Gabe wirklich zurücknehmen?')) return;
+      delete state[id]; render(true); dbSet(id, false);
+    } else if (act === 'save') {
+      if (needSetup()) return;
+      var ed = b.closest('.editor'), r = parseTime(ed.querySelector('.tin').value);
+      if (r.err) { editMsgTxt = r.err; var keep = ed.querySelector('.tin').value; render(true); var n = document.querySelector('[data-ed="' + (id) + '"] .tin'); if (n) n.value = keep; return; }
+      editing = null; editMsgTxt = '';
+      if (id === 'new') { var q2 = queue(); if (!q2.length) { render(true); return; } id = q2[0].id; state[id] = { by: myName, at: new Date(r.ms).toISOString() }; render(true); dbSet(id, true, state[id].at); return; }
+      var cur = state[id], by = cur && typeof cur === 'object' && cur.by ? cur.by : myName;
+      state[id] = { by: by, at: new Date(r.ms).toISOString() };
+      render(true); dbSet(id, true, state[id].at, by);
     }
   });
   document.addEventListener('keydown', function (e) {
     var t = e.target;
     if (!t.classList || !t.classList.contains('tin')) return;
-    var li = t.closest('.item');
-    if (e.key === 'Enter') li.querySelector('.tok').click();
-    else if (e.key === 'Escape') li.querySelector('.tcancel').click();
+    var ed = t.closest('.editor');
+    if (e.key === 'Enter') ed.querySelector('.tok').click();
+    else if (e.key === 'Escape') ed.querySelector('.tcancel').click();
   });
+  document.addEventListener('change', function (e) {
+    var c = e.target;
+    if (c.matches && c.matches('[data-o]')) {
+      if (needSetup()) { c.checked = !c.checked; return; }
+      var id = c.getAttribute('data-o');
+      if (c.checked) { state[id] = { by: myName, at: new Date().toISOString() }; render(true); dbSet(id, true); }
+      else { delete state[id]; render(true); dbSet(id, false); }
+    }
+  });
+  document.addEventListener('toggle', function (e) { if (e.target.id === 'dd') doneOpen = e.target.open; }, true);
+
+  // ---------- Zurücksetzen ----------
+  var box = document.getElementById('resetbox');
+  function showReset() {
+    box.innerHTML = '<button class="reset" id="r1" type="button">Heute zurücksetzen</button>';
+    document.getElementById('r1').onclick = showConfirm;
+  }
+  function showConfirm() {
+    box.innerHTML = '<div class="confirm"><p>Alle Haken von heute für alle entfernen?</p><button class="reset danger" id="r2" type="button">Ja, zurücksetzen</button><button class="reset" id="r3" type="button">Abbrechen</button></div>';
+    document.getElementById('r2').onclick = function () {
+      if (needSetup()) return;
+      DOSES.concat(OTHER).forEach(function (a) { if (state[a.id]) { delete state[a.id]; dbSet(a.id, false); } });
+      render(true); showReset();
+    };
+    document.getElementById('r3').onclick = showReset;
+  }
+  showReset();
 
   // ---------- Start ----------
   loadCfg();
-  apply();
-
+  render(true);
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState !== 'visible') return;
     var k = todayKey();
-    if (k !== dayKey) { dayKey = k; setDatum(); state = {}; apply(); }
+    if (k !== dayKey) { dayKey = k; setDatum(); state = {}; editing = null; render(true); }
     poll();
   });
-
   document.getElementById('setupGo').onclick = function () {
     var n = document.getElementById('inName').value.trim();
     var c = document.getElementById('inCode').value.trim();
@@ -827,7 +545,6 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     start();
   };
   document.getElementById('cfgbtn').onclick = function () { showSetup(''); };
-
   if (!code) showSetup('Gib den Familiencode ein, den du bekommen hast.');
   else if (!myName) showSetup('Wie heißt du? Dein Name steht bei den abgehakten Gaben.');
   else start();
