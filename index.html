@@ -150,6 +150,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
 .tlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .trow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
 .trow:first-child { border-top: 0; }
+.item.skip { opacity: .55; }
 .tinfo { display: flex; flex-direction: column; min-width: 0; }
 .tname { font-weight: 600; overflow-wrap: anywhere; }
 .tsub { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
@@ -320,7 +321,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var list = '';
     sec.items.forEach(function (it, ii) {
       var id = it.id || ('s' + si + 'i' + ii);
-      all.push({ id: id, it: it });
+      all.push({ id: id, it: it, si: si });
       list += rowHtml(id, it, true);
     });
     html += '<section data-sec="' + si + '"><div class="sec-head"><h2>' + sec.title + '</h2><span class="secount"></span></div><ul class="list">' + list + '</ul></section>';
@@ -363,14 +364,15 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   function resolveNames() { return; }
 
   function apply() {
-    var done = 0, nextItem = null;
+    var done = 0, nextItem = null, sk = skippedSet();
     all.forEach(function (a) {
       var el = document.querySelector('[data-id="' + a.id + '"]');
       var cb = el.querySelector('input');
       cb.checked = !!state[a.id];
       cb.disabled = readOnly;
-      if (cb.checked) done++; else if (!nextItem) nextItem = a;
+      if (cb.checked) done++; else if (!nextItem && !sk[a.id]) nextItem = a;
       el.classList.remove('is-next');
+      el.classList.toggle('skip', !!sk[a.id]);
       el.querySelector('.now').hidden = true;
     });
     if (nextItem) {
@@ -564,6 +566,13 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     return txt;
   }
   function plannedMs(it) { return Date.parse(dayKey + 'T' + it.t + ':00'); }
+  // Wurde schon in einem späteren Abschnitt eine Augentropfen-Gabe abgehakt, gelten offene Gaben davor als übersprungen
+  function skippedSet() {
+    var pos = -1, sk = {};
+    all.forEach(function (a) { if (state[a.id] && a.it.k === 'auge' && a.si > pos) pos = a.si; });
+    all.forEach(function (a) { if (!state[a.id] && a.it.k === 'auge' && a.si < pos) sk[a.id] = true; });
+    return sk;
+  }
   function itemOf(m) { return all.filter(function (a) { return a.it.m === m; }); }
 
   // Erwartete Zeit je offener Gabe, abgeleitet aus den echten Abhak-Zeiten
@@ -572,11 +581,12 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var nowUp = Math.ceil(nowMs / 60000) * 60000;
     var GAP = EYE_GAP_MIN * 60000;
     var exp = {};
+    var sk = skippedSet();
     var eyeMeds = meds.filter(function (m) { return m.k === 'auge'; });
     var lastEye = null, st = {};
     eyeMeds.forEach(function (md) {
       var items = itemOf(md.m);
-      var pending = items.filter(function (a) { return !state[a.id]; });
+      var pending = items.filter(function (a) { return !state[a.id] && !sk[a.id]; });
       var last = null;
       items.forEach(function (a) {
         if (!state[a.id]) return;
@@ -586,7 +596,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
         if (lastEye === null || t > lastEye) lastEye = t;
       });
       st[md.m] = { md: md, pending: pending, i: 0,
-        next: pending.length ? (last !== null ? last + md.every * 60000 : (lastEye !== null && pending[0] === items[0] ? 0 : plannedMs(pending[0].it))) : null };
+        next: pending.length ? (last !== null ? last + md.every * 60000 : (lastEye !== null ? 0 : plannedMs(pending[0].it))) : null };
     });
     var prevEnd = lastEye !== null ? lastEye + GAP : -Infinity;
     for (;;) {
@@ -613,6 +623,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var nowMs = Date.now();
     if (todayKey() !== dayKey) { dayKey = todayKey(); setDatum(); state = {}; editing = null; apply(); poll(); return; }
     var exp = buildSchedule();
+    var sk = skippedSet();
     var eyeLast = null;
 
     // Uhrzeiten in der Liste
@@ -621,7 +632,11 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       if (!li) return;
       var te = li.querySelector('.time'), sh = li.querySelector('.shift');
       if (!te || !sh) return;
-      if (state[a.id] || exp[a.id] === undefined) {
+      li.classList.toggle('skip', !!sk[a.id]);
+      if (sk[a.id]) {
+        setText(te, a.it.t);
+        setText(sh, 'übersprungen'); sh.hidden = false;
+      } else if (state[a.id] || exp[a.id] === undefined) {
         setText(te, a.it.t);
         sh.hidden = true;
       } else {
@@ -634,7 +649,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     // Timer je Medikament
     meds.forEach(function (md) {
       var row = tl.querySelector('[data-m="' + md.m + '"]');
-      var items = itemOf(md.m);
+      var items = itemOf(md.m).filter(function (a) { return !sk[a.id]; });
       var givenItems = items.filter(function (a) { return state[a.id]; });
       var last = null;
       givenItems.forEach(function (a) { var t = stamp(a.id); if (t !== null && (last === null || t > last)) last = t; });
