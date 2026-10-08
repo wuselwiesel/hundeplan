@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hundeplan">
+<meta name="theme-color" content="#1f6f66">
+<title>Medikamentenplan Hund</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Layout: eine schmale Spalte, Tageszeit-Abschnitte mit großen Tipp-Zeilen, Fortschritt oben */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #1c2927;
+  --muted: #5d6e6a;
+  --line: #d9e2df;
+  --auge: #2f6fb0;
+  --auge-bg: #e3eefa;
+  --ohr: #b5651d;
+  --ohr-bg: #fbeedd;
+  --oral: #3f7d4e;
+  --oral-bg: #e2f1e6;
+  --accent: #1f6f66;
+  --accent-fg: #ffffff;
+  --focus: #1f6f66;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121a19;
+    --surface: #1b2625;
+    --fg: #e6efed;
+    --muted: #9bb0ab;
+    --line: #2f3f3d;
+    --auge: #7fb4ea;
+    --auge-bg: #1d2f45;
+    --ohr: #e5a566;
+    --ohr-bg: #3a2b1a;
+    --oral: #85c796;
+    --oral-bg: #1e3326;
+    --accent: #5fc4b8;
+    --accent-fg: #0d1a18;
+    --focus: #5fc4b8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121a19;
+  --surface: #1b2625;
+  --fg: #e6efed;
+  --muted: #9bb0ab;
+  --line: #2f3f3d;
+  --auge: #7fb4ea;
+  --auge-bg: #1d2f45;
+  --ohr: #e5a566;
+  --ohr-bg: #3a2b1a;
+  --oral: #85c796;
+  --oral-bg: #1e3326;
+  --accent: #5fc4b8;
+  --accent-fg: #0d1a18;
+  --focus: #5fc4b8;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+h1 { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0; letter-spacing: 0.01em; }
+.sub { color: var(--muted); margin: 4px 0 0; font-size: 0.95rem; }
+
+.progress { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.progress-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.count { font-family: var(--font-display); font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.count small { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); font-weight: 400; }
+.bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s ease; }
+.next { font-size: 0.95rem; color: var(--muted); margin: 0; }
+.next b { color: var(--fg); font-weight: 600; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.auge { background: var(--auge); } .dot.ohr { background: var(--ohr); } .dot.oral { background: var(--oral); }
+
+section { display: flex; flex-direction: column; gap: 8px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-inline: 2px; }
+.sec-head span { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.item { position: relative; }
+.item input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+.row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 64px; transition: background 0.15s, opacity 0.15s; }
+.box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; background: transparent; transition: background 0.15s, border-color 0.15s; }
+.box svg { width: 16px; height: 16px; opacity: 0; stroke: var(--accent-fg); }
+.item input:checked + .row .what, .item input:checked + .row .how, .item input:checked + .row .time, .item input:checked + .row .tag, .item input:checked + .row .shift { opacity: 0.6; }
+.item input:checked + .row .box { background: var(--accent); border-color: var(--accent); }
+.item input:checked + .row .box svg { opacity: 1; }
+.item input:checked + .row .what { text-decoration: line-through; text-decoration-thickness: 1px; }
+.item input:focus-visible + .row { outline: 3px solid var(--focus); outline-offset: 2px; }
+.item.is-next .row { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.line1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.time { font-family: var(--font-display); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.what { font-weight: 600; overflow-wrap: anywhere; }
+.how { color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
+.tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; }
+.tag.auge { color: var(--auge); background: var(--auge-bg); }
+.tag.ohr { color: var(--ohr); background: var(--ohr-bg); }
+.tag.oral { color: var(--oral); background: var(--oral-bg); }
+.now { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.note ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 6px; }
+.note li { font-size: 0.95rem; }
+
+button.reset { font: inherit; font-weight: 600; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-height: 48px; cursor: pointer; }
+button.reset:hover { border-color: var(--muted); }
+button.reset:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.confirm p { margin: 0; flex-basis: 100%; font-size: 0.95rem; }
+button.danger { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.shift { font-size: 0.75rem; font-weight: 600; color: var(--ohr); }
+.by { font-size: 0.9rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+.item input:disabled { cursor: default; }
+button.reset:disabled { opacity: 0.5; cursor: default; }
+.hint { border-color: var(--ohr); }
+.hint p { margin: 0; font-size: 0.95rem; }
+
+.timers { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.gap { margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--ohr); background: var(--ohr-bg); border-radius: 8px; padding: 8px 10px; }
+.tlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.trow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.trow:first-child { border-top: 0; }
+.tinfo { display: flex; flex-direction: column; min-width: 0; }
+.tname { font-weight: 600; overflow-wrap: anywhere; }
+.tsub { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
+.tcount { font-family: var(--font-display); font-size: 1.2rem; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.trow[data-state="idle"] .tcount, .trow[data-state="done"] .tcount { color: var(--muted); font-size: 1rem; font-family: var(--font-body); font-weight: 500; }
+.trow[data-state="due"] .tcount { color: var(--accent-fg); background: var(--accent); border-radius: 8px; padding: 4px 12px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.setup { border-color: var(--accent); }
+.setup label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+.setup input { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-height: 48px; width: 100%; }
+.setup input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.setup .msg { margin: 0; font-size: 0.95rem; }
+.bytxt { font-size: 0.9rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+.byrow { position: relative; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; }
+.edit { font: inherit; font-size: 0.85rem; color: var(--muted); background: none; border: 0; text-decoration: underline; padding: 6px 0; min-height: 36px; cursor: pointer; }
+.editor { position: relative; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.tin { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-height: 44px; font-variant-numeric: tabular-nums; }
+.tok, .tcancel { font: inherit; font-size: 0.9rem; font-weight: 600; border-radius: 10px; min-height: 44px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--fg); }
+.tok { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.editmsg { flex-basis: 100%; font-size: 0.85rem; color: var(--ohr); font-weight: 600; }
+.edit:focus-visible, .tin:focus-visible, .tok:focus-visible, .tcancel:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.linkbtn { font: inherit; font-size: 0.9rem; color: var(--muted); background: none; border: 0; text-decoration: underline; padding: 12px 4px; min-height: 44px; cursor: pointer; align-self: center; }
+.linkbtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Medikamentenplan Hund</h1>
+    <p class="sub" id="datum"></p>
+  </header>
+
+  <div class="note setup" id="setup" hidden>
+    <h2>Einmal einrichten</h2>
+    <p class="msg" id="setupmsg"></p>
+    <label for="inName">Dein Name</label>
+    <input id="inName" type="text" autocomplete="given-name" maxlength="30">
+    <label for="inCode">Familiencode</label>
+    <input id="inCode" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40">
+    <button class="reset danger" id="setupGo" type="button">Speichern</button>
+  </div>
+
+  <div class="progress" aria-live="polite">
+    <div class="progress-top">
+      <div class="count"><span id="done">0</span> von <span id="total">17</span> <small>Gaben heute</small></div>
+    </div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><i id="barfill"></i></div>
+    <p class="next" id="next"></p>
+  </div>
+
+  <div class="timers"><h2>Nächste Gabe</h2><p class="gap" id="gap" hidden></p><ul class="tlist" id="timers"></ul></div>
+
+  <div class="note hint" id="hinweis" hidden><p></p></div>
+
+  <div class="legend" aria-label="Legende">
+    <span><i class="dot auge"></i>Auge links</span>
+    <span><i class="dot ohr"></i>Ohr</span>
+    <span><i class="dot oral"></i>Zum Einnehmen</span>
+  </div>
+
+  <div id="sections"></div>
+
+  <section>
+    <div class="sec-head"><h2>Einmalig</h2></div>
+    <ul class="list" id="once"></ul>
+  </section>
+
+  <div class="note">
+    <h2>Zum Beachten</h2>
+    <ul>
+      <li>Zwischen den Augentropfen mindestens 15 Minuten Abstand.</li>
+      <li>Metacam: Menge nach Gewicht, genau nach Angabe auf dem Etikett. Ab heute 2 bis 3 Tage, danach nach Rücksprache mit dem Tierarzt reduzieren.</li>
+      <li>Baytril-Ohrlösung: 1 ml, eine Stunde nach der Spülung.</li>
+      <li>Mit Baby: Alles nach jeder Gabe sofort außer Reichweite wegräumen und danach die Hände waschen.</li>
+    </ul>
+  </div>
+
+  <div id="resetbox"></div>
+  <button class="linkbtn" id="cfgbtn" type="button">Name oder Code ändern</button>
+</div>
+
+<script>
+
+(function () {
+  var plan = [
+    { title: 'Vormittag', items: [
+      { t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
+      { t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
+      { t: '10:45', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts', m: 'auris' },
+      { t: '10:45', w: 'Metacam', h: 'Mit dem Frühstück, Menge laut Etikett', k: 'oral', tag: 'Oral', m: 'meta' },
+      { t: '11:45', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts', m: 'bay' }
+    ]},
+    { title: 'Mittag', items: [
+      { t: '12:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { t: '14:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
+      { t: '14:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
+    ]},
+    { title: 'Nachmittag', items: [
+      { t: '15:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { t: '17:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' }
+    ]},
+    { title: 'Abend', items: [
+      { t: '18:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
+      { t: '18:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
+      { t: '20:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { t: '22:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
+      { t: '22:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
+      { t: '22:45', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
+    ]}
+  ];
+  var once = [{ id: 'einmal-ohr-links', w: 'Linkes Ohr spülen', h: 'Einmalig, mit Auris Ohrreiniger', k: 'ohr', tag: 'Ohr links' }];
+
+  function todayKey() {
+    var n = new Date();
+    return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  }
+  var dayKey = todayKey();
+
+  // state: item id -> true (lokal) oder {by, at} (geteilt)
+  var state = {};
+  var mode = 'db';      // 'local' oder 'db'
+  var readOnly = false;
+  var db = null, user = null, myId = null, unsub = null;
+  var names = {};          // user id -> Anzeigename
+  var chain = {};          // item id -> Promise (ein Schreibvorgang pro Dokument)
+  var localDay = {}, localOnce = {};
+
+  var hint = document.getElementById('hinweis');
+  function showHint(msg) {
+    if (msg) { hint.querySelector('p').textContent = msg; hint.hidden = false; }
+    else { hint.hidden = true; }
+  }
+
+  function lget(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
+  function lset(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  function setDatum() {
+    try {
+      document.getElementById('datum').textContent = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+    } catch (e) {}
+  }
+  setDatum();
+
+  var check = '<svg viewBox="0 0 16 16" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+  function rowHtml(id, it, withTime) {
+    return '<li class="item" data-id="' + id + '">' +
+      '<input type="checkbox" id="c-' + id + '" aria-label="' + (withTime ? it.t + ' Uhr, ' : '') + it.w + ', ' + it.tag + '">' +
+      '<div class="row"><span class="box">' + check + '</span><span class="text">' +
+      '<span class="line1">' + (withTime ? '<span class="time">' + it.t + '</span><span class="shift" hidden></span>' : '') +
+      '<span class="tag ' + it.k + '">' + it.tag + '</span><span class="now" hidden>Als Nächstes</span></span>' +
+      '<span class="what">' + it.w + '</span><span class="how">' + it.h + '</span>' +
+      '<span class="byrow" hidden><span class="bytxt"></span><button class="edit" type="button">Zeit ändern</button></span>' +
+      '<span class="editor" hidden><input class="tin" type="time" aria-label="Uhrzeit"><button class="tok" type="button">Speichern</button><button class="tcancel" type="button">Abbrechen</button><span class="editmsg" hidden></span></span></span></div></li>';
+  }
+
+  var all = [];
+  var html = '';
+  plan.forEach(function (sec, si) {
+    var list = '';
+    sec.items.forEach(function (it, ii) {
+      var id = 's' + si + 'i' + ii;
+      all.push({ id: id, it: it });
+      list += rowHtml(id, it, true);
+    });
+    html += '<section data-sec="' + si + '"><div class="sec-head"><h2>' + sec.title + '</h2><span class="secount"></span></div><ul class="list">' + list + '</ul></section>';
+  });
+  document.getElementById('sections').innerHTML = '<div style="display:flex;flex-direction:column;gap:20px">' + html + '</div>';
+  document.getElementById('once').innerHTML = once.map(function (o) { return rowHtml(o.id, o, false); }).join('');
+  document.getElementById('total').textContent = all.length;
+
+  function fmtTime(iso) {
+    try { return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+  }
+
+  var editing = null;
+  function applyBy() {
+    var ids = all.map(function (a) { return a.id; }).concat(once.map(function (o) { return o.id; }));
+    ids.forEach(function (id) {
+      var li = document.querySelector('[data-id="' + id + '"]');
+      var row = li.querySelector('.byrow'), txt = li.querySelector('.bytxt'), ed = li.querySelector('.editor');
+      var s = state[id];
+      if (!s) {
+        if (editing === id) editing = null;
+        txt.textContent = '';
+        row.hidden = true;
+        ed.hidden = true;
+        return;
+      }
+      if (typeof s === 'object') {
+        var who = s.by ? (s.by === myName ? 'Du' : s.by) : '';
+        var tm = s.at ? fmtTime(s.at) : '';
+        txt.textContent = (tm ? 'Gegeben um ' + tm + ' Uhr' : 'Erledigt') + (who ? ' · ' + who : '');
+      } else {
+        txt.textContent = 'Erledigt';
+      }
+      row.hidden = editing === id;
+      ed.hidden = editing !== id;
+    });
+  }
+
+  function resolveNames() { return; }
+
+  function apply() {
+    var done = 0, nextItem = null;
+    all.forEach(function (a) {
+      var el = document.querySelector('[data-id="' + a.id + '"]');
+      var cb = el.querySelector('input');
+      cb.checked = !!state[a.id];
+      cb.disabled = readOnly;
+      if (cb.checked) done++; else if (!nextItem) nextItem = a;
+      el.classList.remove('is-next');
+      el.querySelector('.now').hidden = true;
+    });
+    if (nextItem) {
+      var ne = document.querySelector('[data-id="' + nextItem.id + '"]');
+      ne.classList.add('is-next');
+      ne.querySelector('.now').hidden = false;
+      document.getElementById('next').innerHTML = 'Als Nächstes: <b>' + nextItem.it.t + ' Uhr, ' + nextItem.it.w + '</b>';
+    } else {
+      document.getElementById('next').innerHTML = '<b>Alles für heute erledigt.</b>';
+    }
+    document.getElementById('done').textContent = done;
+    var pct = Math.round(done / all.length * 100);
+    document.getElementById('barfill').style.width = pct + '%';
+    document.getElementById('bar').setAttribute('aria-valuenow', pct);
+    plan.forEach(function (sec, si) {
+      var d = 0;
+      sec.items.forEach(function (it, ii) { if (state['s' + si + 'i' + ii]) d++; });
+      document.querySelector('[data-sec="' + si + '"] .secount').textContent = d + ' von ' + sec.items.length;
+    });
+    once.forEach(function (o) {
+      var cb = document.getElementById('c-' + o.id);
+      cb.checked = !!state[o.id];
+      cb.disabled = readOnly;
+    });
+    applyBy();
+    resolveNames();
+    renderTimers();
+    var rb = document.getElementById('r1');
+    if (rb) rb.disabled = readOnly;
+  }
+
+  // ---------- Verbindung zur Datenbank ----------
+  var SUPA_URL = 'https://vdflmmdmezaersrssdci.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkZmxtbWRtZXphZXJzcnNzZGNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2NDUwMDMsImV4cCI6MjEwNDIyMTAwM30.AlDPAJqVvM_fLlrmzyBNgj4wFzRe_jDnChkTUi6ZH84';
+  var myName = '', code = '', inflight = 0, pollTimer = null;
+
+  function rpc(fn, body) {
+    return fetch(SUPA_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        if (r.ok) return t ? JSON.parse(t) : null;
+        var e = new Error('http ' + r.status);
+        e.status = r.status; e.body = t;
+        throw e;
+      });
+    });
+  }
+
+  function loadCfg() {
+    try { code = localStorage.getItem('hundeplan-code') || ''; myName = localStorage.getItem('hundeplan-name') || ''; } catch (e) {}
+    var m = /[#&]c=([A-Za-z0-9]+)/.exec(location.hash || '');
+    if (m) {
+      code = m[1];
+      saveCfg();
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    }
+  }
+  function saveCfg() {
+    try { localStorage.setItem('hundeplan-code', code); localStorage.setItem('hundeplan-name', myName); } catch (e) {}
+  }
+
+  var setupBox = document.getElementById('setup');
+  function showSetup(msg) {
+    document.getElementById('setupmsg').textContent = msg || '';
+    document.getElementById('inName').value = myName;
+    document.getElementById('inCode').value = code;
+    setupBox.hidden = false;
+  }
+
+  function parseState(rows) {
+    var st = {};
+    (rows || []).forEach(function (r) { if (r.done) st[r.item] = { by: r.by_name || '', at: (r.at || '').replace(/(\.\d{3})\d+/, '$1') }; });
+    return st;
+  }
+
+  function handleNetError(e) {
+    if (e && /ungueltiger code/.test(e.body || '')) {
+      code = ''; saveCfg();
+      showSetup('Der Familiencode stimmt nicht. Bitte prüfe ihn.');
+      return;
+    }
+    showHint('Keine Verbindung. Die Liste aktualisiert sich, sobald es wieder klappt.');
+  }
+
+  function poll() {
+    if (!code || !myName || inflight > 0 || document.visibilityState === 'hidden') return Promise.resolve();
+    return rpc('hundeplan_get', { p_code: code, p_days: [dayKey, 'einmalig'] }).then(function (rows) {
+      if (inflight > 0) return;
+      state = parseState(rows);
+      showHint('');
+      apply();
+    }, handleNetError);
+  }
+
+  function start() {
+    poll();
+    if (!pollTimer) pollTimer = setInterval(poll, 5000);
+  }
+
+  function dbSet(id, checked, atIso, byName) {
+    var isOnce = id.indexOf('einmal') === 0;
+    var day = isOnce ? 'einmalig' : dayKey;
+    inflight++;
+    chain[id] = (chain[id] || Promise.resolve()).then(function () {
+      return rpc('hundeplan_set_v2', { p_code: code, p_day: day, p_item: id, p_done: checked, p_by: byName || myName, p_at: atIso || null });
+    }).catch(handleNetError).then(function () {
+      inflight--;
+      return poll();
+    });
+    return chain[id];
+  }
+
+  document.addEventListener('change', function (e) {
+    var li = e.target.closest && e.target.closest('.item');
+    if (!li) return;
+    if (!code || !myName) {
+      e.target.checked = !e.target.checked;
+      showSetup('Bitte zuerst Namen und Familiencode eintragen.');
+      return;
+    }
+    var id = li.getAttribute('data-id');
+    var checked = e.target.checked;
+    if (checked) state[id] = { by: myName, at: new Date().toISOString() }; else delete state[id];
+    apply();
+    dbSet(id, checked);
+  });
+
+  // ---------- Zurücksetzen ----------
+  var box = document.getElementById('resetbox');
+  function showReset() {
+    box.innerHTML = '<button class="reset" id="r1" type="button">Heute zurücksetzen</button>';
+    document.getElementById('r1').disabled = readOnly;
+    document.getElementById('r1').onclick = showConfirm;
+  }
+  function showConfirm() {
+    box.innerHTML = '<div class="confirm"><p>Alle Haken von heute für alle entfernen?</p><button class="reset danger" id="r2" type="button">Ja, zurücksetzen</button><button class="reset" id="r3" type="button">Abbrechen</button></div>';
+    document.getElementById('r2').onclick = function () {
+      all.forEach(function (a) { if (state[a.id]) { delete state[a.id]; dbSet(a.id, false); } });
+      apply();
+      showReset();
+    };
+    document.getElementById('r3').onclick = showReset;
+  }
+  showReset();
+
+
+  // ---------- Timer pro Medikament ----------
+  var meds = [
+    { m: 'rego', name: 'Regoculan', k: 'auge', every: 150, note: 'alle 2,5 Std.' },
+    { m: 'cef', name: 'Cefenicol', k: 'auge', every: 240, note: 'alle 4 Std.' },
+    { m: 'stro', name: 'Stromease', k: 'auge', every: 240, note: 'alle 4 Std.' },
+    { m: 'bay', name: 'Baytril-Ohrlösung', k: 'ohr', after: 'auris', every: 60, note: '1 Std. nach der Spülung' },
+    { m: 'meta', name: 'Metacam', k: 'oral', every: 1440, note: '1x täglich' }
+  ];
+  var EYE_GAP_MIN = 15;
+  var tl = document.getElementById('timers');
+  tl.innerHTML = meds.map(function (md) {
+    return '<li class="trow" data-m="' + md.m + '"><i class="dot ' + md.k + '"></i>' +
+      '<div class="tinfo"><span class="tname">' + md.name + '</span><span class="tsub"></span></div>' +
+      '<span class="tcount"></span></li>';
+  }).join('');
+
+  function fmtCount(ms) {
+    var sec = Math.max(0, Math.round(ms / 1000));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), r = sec % 60;
+    if (h > 0) return h + ' Std. ' + String(m).padStart(2, '0') + ' Min.';
+    return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+  }
+  function stamp(id) {
+    var s = state[id];
+    var t = s && typeof s === 'object' && s.at ? Date.parse(s.at) : NaN;
+    return isNaN(t) ? null : t;
+  }
+  function setText(el, txt) { if (el.textContent !== txt) el.textContent = txt; }
+
+  function clock(ms) {
+    var d = new Date(ms);
+    var txt = fmtTime(d.toISOString());
+    var base = new Date(dayKey + 'T00:00:00');
+    if (d.getDate() !== base.getDate()) txt += ' (morgen)';
+    return txt;
+  }
+  function plannedMs(it) { return Date.parse(dayKey + 'T' + it.t + ':00'); }
+  function itemOf(m) { return all.filter(function (a) { return a.it.m === m; }); }
+
+  // Erwartete Zeit je offener Gabe, abgeleitet aus den echten Abhak-Zeiten
+  function buildSchedule() {
+    var nowMs = Date.now();
+    var nowUp = Math.ceil(nowMs / 60000) * 60000;
+    var GAP = EYE_GAP_MIN * 60000;
+    var exp = {};
+    var eyeMeds = meds.filter(function (m) { return m.k === 'auge'; });
+    var lastEye = null, st = {};
+    eyeMeds.forEach(function (md) {
+      var items = itemOf(md.m);
+      var pending = items.filter(function (a) { return !state[a.id]; });
+      var last = null;
+      items.forEach(function (a) {
+        if (!state[a.id]) return;
+        var t = stamp(a.id);
+        if (t === null) return;
+        if (last === null || t > last) last = t;
+        if (lastEye === null || t > lastEye) lastEye = t;
+      });
+      st[md.m] = { md: md, pending: pending, i: 0,
+        next: pending.length ? (last !== null ? last + md.every * 60000 : plannedMs(pending[0].it)) : null };
+    });
+    var prevEnd = lastEye !== null ? lastEye + GAP : -Infinity;
+    for (;;) {
+      var pick = null;
+      eyeMeds.forEach(function (md) {
+        var x = st[md.m];
+        if (x.next !== null && x.i < x.pending.length && (pick === null || x.next < pick.next)) pick = x;
+      });
+      if (!pick) break;
+      var slot = Math.max(pick.next, prevEnd);
+      exp[pick.pending[pick.i].id] = slot;
+      var eff = Math.max(slot, nowUp);
+      prevEnd = eff + GAP;
+      pick.i++;
+      pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
+    }
+    // Ohr und Metacam folgen den ersten Augentropfen, Baytril folgt der Spülung
+    var firstDrops = null;
+    eyeMeds.forEach(function (md) {
+      var f = itemOf(md.m)[0];
+      var t = state[f.id] ? stamp(f.id) : (exp[f.id] !== undefined ? exp[f.id] : null);
+      if (t !== null && (firstDrops === null || t > firstDrops)) firstDrops = t;
+    });
+    var au = itemOf('auris')[0], me = itemOf('meta')[0], ba = itemOf('bay')[0];
+    var earBase = plannedMs(au.it);
+    if (firstDrops !== null) earBase = Math.max(earBase, firstDrops + GAP);
+    if (!state[au.id]) exp[au.id] = earBase;
+    if (!state[me.id]) exp[me.id] = Math.max(plannedMs(me.it), earBase);
+    if (!state[ba.id]) {
+      var aAt = state[au.id] ? stamp(au.id) : null;
+      var aEff = aAt !== null ? aAt : Math.max(earBase, nowUp);
+      exp[ba.id] = aEff + 60 * 60000;
+    }
+    return exp;
+  }
+
+  function renderTimers() {
+    var nowMs = Date.now();
+    var exp = buildSchedule();
+    var eyeLast = null;
+
+    // Uhrzeiten in der Liste
+    all.forEach(function (a) {
+      var li = document.querySelector('[data-id="' + a.id + '"]');
+      if (!li) return;
+      var te = li.querySelector('.time'), sh = li.querySelector('.shift');
+      if (!te || !sh) return;
+      if (state[a.id] || exp[a.id] === undefined) {
+        setText(te, a.it.t);
+        sh.hidden = true;
+      } else {
+        var txt = clock(exp[a.id]);
+        setText(te, txt);
+        if (txt !== a.it.t) { setText(sh, 'statt ' + a.it.t); sh.hidden = false; } else { sh.hidden = true; }
+      }
+    });
+
+    // Timer je Medikament
+    meds.forEach(function (md) {
+      var row = tl.querySelector('[data-m="' + md.m + '"]');
+      var items = itemOf(md.m);
+      var givenItems = items.filter(function (a) { return state[a.id]; });
+      var last = null;
+      givenItems.forEach(function (a) { var t = stamp(a.id); if (t !== null && (last === null || t > last)) last = t; });
+      if (md.k === 'auge' && last !== null && (eyeLast === null || last > eyeLast)) eyeLast = last;
+
+      var cnt = '', sub = '', cls = '';
+      var multi = items.length > 1;
+      var tail = multi ? ' · ' + givenItems.length + ' von ' + items.length : '';
+
+      if (givenItems.length >= items.length) {
+        cnt = 'Fertig'; cls = 'done';
+        sub = md.m === 'meta' && last !== null ? 'Nächste Gabe morgen gegen ' + fmtTime(new Date(last).toISOString()) + ' Uhr'
+            : multi ? 'Heute alle ' + items.length + ' Gaben erledigt' : 'Heute erledigt';
+      } else {
+        var first = items.filter(function (a) { return !state[a.id]; })[0];
+        var due = exp[first.id];
+        var diff = due - nowMs;
+        var preOk = true;
+        if (md.after) { var pre = itemOf(md.after)[0]; preOk = !!state[pre.id]; }
+        if (!preOk) {
+          cnt = 'Offen'; cls = 'idle';
+          sub = 'Nach der Auris-Spülung, ca. ' + clock(due) + ' Uhr';
+        } else if (givenItems.length > 0 || diff <= 60 * 60000) {
+          if (diff > 0) {
+            cnt = fmtCount(diff); cls = 'wait';
+            sub = 'Nächste Gabe um ' + clock(due) + ' Uhr' + tail;
+          } else {
+            var over = Math.floor(-diff / 60000);
+            cnt = 'Jetzt'; cls = 'due';
+            sub = (over < 1 ? 'Gerade fällig' : 'Seit ' + over + ' Min. fällig') + tail;
+          }
+        } else {
+          cnt = 'Offen'; cls = 'idle';
+          sub = 'Geplant: ' + clock(due) + ' Uhr' + tail;
+        }
+      }
+      setText(row.querySelector('.tcount'), cnt);
+      setText(row.querySelector('.tsub'), sub);
+      if (row.getAttribute('data-state') !== cls) row.setAttribute('data-state', cls);
+    });
+
+    var gap = document.getElementById('gap');
+    var gapLeft = eyeLast !== null ? eyeLast + EYE_GAP_MIN * 60000 - nowMs : 0;
+    if (gapLeft > 0) {
+      setText(gap, 'Augentropfen-Abstand: Der nächste Tropfen ist in ' + fmtCount(gapLeft) + ' erlaubt.');
+      gap.hidden = false;
+    } else {
+      gap.hidden = true;
+    }
+  }
+  setInterval(renderTimers, 1000);
+
+  // ---------- Uhrzeit nachträglich ändern ----------
+  function hhmm(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  function editMsg(li, msg) {
+    var m = li.querySelector('.editmsg');
+    m.textContent = msg || '';
+    m.hidden = !msg;
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var li = t.closest && t.closest('.item');
+    if (!li) return;
+    var id = li.getAttribute('data-id');
+    if (t.classList.contains('edit')) {
+      var s = state[id];
+      editing = id;
+      editMsg(li, '');
+      li.querySelector('.tin').value = (s && typeof s === 'object' && s.at) ? hhmm(s.at) : '';
+      applyBy();
+      li.querySelector('.tin').focus();
+    } else if (t.classList.contains('tcancel')) {
+      editing = null;
+      applyBy();
+    } else if (t.classList.contains('tok')) {
+      var v = li.querySelector('.tin').value;
+      if (!/^\d{2}:\d{2}$/.test(v)) { editMsg(li, 'Bitte eine Uhrzeit eintragen.'); return; }
+      var ms = Date.parse(dayKey + 'T' + v + ':00');
+      if (isNaN(ms)) { editMsg(li, 'Diese Uhrzeit ist ungültig.'); return; }
+      if (ms > Date.now() + 60000) { editMsg(li, 'Die Uhrzeit liegt in der Zukunft.'); return; }
+      var cur = state[id];
+      var by = cur && typeof cur === 'object' && cur.by ? cur.by : myName;
+      var iso = new Date(ms).toISOString();
+      state[id] = { by: by, at: iso };
+      editing = null;
+      apply();
+      dbSet(id, true, iso, by);
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (!t.classList || !t.classList.contains('tin')) return;
+    var li = t.closest('.item');
+    if (e.key === 'Enter') li.querySelector('.tok').click();
+    else if (e.key === 'Escape') li.querySelector('.tcancel').click();
+  });
+
+  // ---------- Start ----------
+  loadCfg();
+  apply();
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible') return;
+    var k = todayKey();
+    if (k !== dayKey) { dayKey = k; setDatum(); state = {}; apply(); }
+    poll();
+  });
+
+  document.getElementById('setupGo').onclick = function () {
+    var n = document.getElementById('inName').value.trim();
+    var c = document.getElementById('inCode').value.trim();
+    if (!n || !c) { document.getElementById('setupmsg').textContent = 'Bitte beides ausfüllen.'; return; }
+    myName = n; code = c; saveCfg();
+    setupBox.hidden = true;
+    showHint('');
+    start();
+  };
+  document.getElementById('cfgbtn').onclick = function () { showSetup(''); };
+
+  if (!code) showSetup('Gib den Familiencode ein, den du bekommen hast.');
+  else if (!myName) showSetup('Wie heißt du? Dein Name steht bei den abgehakten Gaben.');
+  else start();
+})();
+</script>
+</body>
+</html>
