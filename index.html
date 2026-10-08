@@ -214,6 +214,11 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   <div id="sections"></div>
 
   <section>
+    <div class="sec-head"><h2>Ohr rechts, ohne Uhrzeit</h2><span class="secount" id="earcount"></span></div>
+    <ul class="list" id="ear"></ul>
+  </section>
+
+  <section>
     <div class="sec-head"><h2>Einmalig</h2></div>
     <ul class="list" id="once"></ul>
   </section>
@@ -240,9 +245,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       { id: 's0i4', t: '10:00', w: 'Metacam', h: 'Als Erstes am Morgen, Menge laut Etikett', k: 'oral', tag: 'Oral', m: 'meta' },
       { id: 's0i0', t: '10:00', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
       { id: 's0i1', t: '10:15', w: 'Cefenicol', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'cef' },
-      { id: 's0i2', t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' },
-      { id: 's0i3', t: '10:45', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts', m: 'auris' },
-      { id: 's0i5', t: '11:45', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts', m: 'bay' }
+      { id: 's0i2', t: '10:30', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
     ]},
     { title: 'Mittag', items: [
       { t: '12:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
@@ -261,6 +264,10 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       { t: '22:30', w: 'Regoculan', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'rego' },
       { t: '22:45', w: 'Stromease', h: '1 Tropfen', k: 'auge', tag: 'Auge links', m: 'stro' }
     ]}
+  ];
+  var ear = [
+    { id: 's0i3', w: 'Auris Ohrreiniger', h: 'Ohr fluten, danach 1 Minute massieren', k: 'ohr', tag: 'Ohr rechts' },
+    { id: 's0i5', w: 'Baytril-Ohrlösung', h: '1 ml, eine Stunde nach der Spülung', k: 'ohr', tag: 'Ohr rechts' }
   ];
   var once = [{ id: 'einmal-ohr-links', w: 'Linkes Ohr spülen', h: 'Einmalig, mit Auris Ohrreiniger', k: 'ohr', tag: 'Ohr links' }];
 
@@ -320,7 +327,8 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   });
   document.getElementById('sections').innerHTML = '<div style="display:flex;flex-direction:column;gap:20px">' + html + '</div>';
   document.getElementById('once').innerHTML = once.map(function (o) { return rowHtml(o.id, o, false); }).join('');
-  document.getElementById('total').textContent = all.length;
+  document.getElementById('ear').innerHTML = ear.map(function (o) { return rowHtml(o.id, o, false); }).join('');
+  document.getElementById('total').textContent = all.length + ear.length;
 
   function fmtTime(iso) {
     try { return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
@@ -328,7 +336,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
 
   var editing = null;
   function applyBy() {
-    var ids = all.map(function (a) { return a.id; }).concat(once.map(function (o) { return o.id; }));
+    var ids = all.map(function (a) { return a.id; }).concat(ear.map(function (o) { return o.id; })).concat(once.map(function (o) { return o.id; }));
     ids.forEach(function (id) {
       var li = document.querySelector('[data-id="' + id + '"]');
       var row = li.querySelector('.byrow'), txt = li.querySelector('.bytxt'), ed = li.querySelector('.editor');
@@ -373,8 +381,18 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     } else {
       document.getElementById('next').innerHTML = '<b>Alles für heute erledigt.</b>';
     }
+    var earDone = 0;
+    ear.forEach(function (o) {
+      var cb = document.getElementById('c-' + o.id);
+      cb.checked = !!state[o.id];
+      cb.disabled = readOnly;
+      if (cb.checked) earDone++;
+    });
+    document.getElementById('earcount').textContent = earDone + ' von ' + ear.length;
+    done += earDone;
+    var total = all.length + ear.length;
     document.getElementById('done').textContent = done;
-    var pct = Math.round(done / all.length * 100);
+    var pct = Math.round(done / total * 100);
     document.getElementById('barfill').style.width = pct + '%';
     document.getElementById('bar').setAttribute('aria-valuenow', pct);
     plan.forEach(function (sec, si) {
@@ -503,7 +521,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   function showConfirm() {
     box.innerHTML = '<div class="confirm"><p>Alle Haken von heute für alle entfernen?</p><button class="reset danger" id="r2" type="button">Ja, zurücksetzen</button><button class="reset" id="r3" type="button">Abbrechen</button></div>';
     document.getElementById('r2').onclick = function () {
-      all.forEach(function (a) { if (state[a.id]) { delete state[a.id]; dbSet(a.id, false); } });
+      all.concat(ear).forEach(function (a) { if (state[a.id]) { delete state[a.id]; dbSet(a.id, false); } });
       apply();
       showReset();
     };
@@ -517,7 +535,6 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     { m: 'rego', name: 'Regoculan', k: 'auge', every: 150, note: 'alle 2,5 Std.' },
     { m: 'cef', name: 'Cefenicol', k: 'auge', every: 240, note: 'alle 4 Std.' },
     { m: 'stro', name: 'Stromease', k: 'auge', every: 240, note: 'alle 4 Std.' },
-    { m: 'bay', name: 'Baytril-Ohrlösung', k: 'ohr', after: 'auris', every: 60, note: '1 Std. nach der Spülung' },
     { m: 'meta', name: 'Metacam', k: 'oral', every: 1440, note: '1x täglich' }
   ];
   var EYE_GAP_MIN = 15;
@@ -588,23 +605,9 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       pick.i++;
       pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
     }
-    // Ohr folgt den ersten Augentropfen, Metacam kommt als Erstes, Baytril folgt der Spülung
-    var firstDrops = null;
-    eyeMeds.forEach(function (md) {
-      var f = itemOf(md.m)[0];
-      var t = state[f.id] ? stamp(f.id) : (exp[f.id] !== undefined ? exp[f.id] : null);
-      if (t !== null && (firstDrops === null || t > firstDrops)) firstDrops = t;
-    });
-    var au = itemOf('auris')[0], me = itemOf('meta')[0], ba = itemOf('bay')[0];
-    var earBase = plannedMs(au.it);
-    if (firstDrops !== null) earBase = Math.max(earBase, firstDrops + GAP);
-    if (!state[au.id]) exp[au.id] = earBase;
+    // Metacam kommt als Erstes am Morgen, unabhängig von den Tropfen
+    var me = itemOf('meta')[0];
     if (!state[me.id]) exp[me.id] = plannedMs(me.it);
-    if (!state[ba.id]) {
-      var aAt = state[au.id] ? stamp(au.id) : null;
-      var aEff = aAt !== null ? aAt : Math.max(earBase, nowUp);
-      exp[ba.id] = aEff + 60 * 60000;
-    }
     return exp;
   }
 
