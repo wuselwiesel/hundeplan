@@ -343,10 +343,9 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       var row = li.querySelector('.byrow'), txt = li.querySelector('.bytxt'), ed = li.querySelector('.editor');
       var s = state[id];
       if (!s) {
-        if (editing === id) editing = null;
         txt.textContent = '';
         row.hidden = true;
-        ed.hidden = true;
+        ed.hidden = editing !== id;
         return;
       }
       if (typeof s === 'object') {
@@ -499,6 +498,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
   }
 
   document.addEventListener('change', function (e) {
+    if (!e.target.matches || !e.target.matches('input[type="checkbox"]')) return;
     var li = e.target.closest && e.target.closest('.item');
     if (!li) return;
     if (!code || !myName) {
@@ -508,6 +508,18 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     }
     var id = li.getAttribute('data-id');
     var checked = e.target.checked;
+    if (checked && li.classList.contains('skip')) {
+      // Nachtragen: erst die Uhrzeit abfragen, damit der Plan nicht neu startet
+      e.target.checked = false;
+      var item = all.filter(function (a) { return a.id === id; })[0];
+      var tin = li.querySelector('.tin');
+      tin.value = hhmm(new Date(Math.min(plannedMs(item.it), Date.now())).toISOString());
+      editing = id;
+      editMsg(li, '');
+      applyBy();
+      tin.focus();
+      return;
+    }
     if (checked) state[id] = { by: myName, at: new Date().toISOString() }; else delete state[id];
     apply();
     dbSet(id, checked);
@@ -636,7 +648,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       li.classList.toggle('skip', !!sk[a.id]);
       if (sk[a.id]) {
         setText(te, a.it.t);
-        setText(sh, 'übersprungen'); sh.hidden = false;
+        setText(sh, 'übersprungen · antippen zum Nachtragen'); sh.hidden = false;
       } else if (!state[a.id] && exp[a.id] !== undefined && exp[a.id] >= eod()) {
         setText(te, a.it.t);
         setText(sh, 'heute nicht mehr'); sh.hidden = false;
