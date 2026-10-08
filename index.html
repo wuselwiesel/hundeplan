@@ -609,7 +609,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
         if (lastEye === null || t > lastEye) lastEye = t;
       });
       st[md.m] = { md: md, pending: pending, i: 0,
-        next: pending.length ? (last !== null ? last + md.every * 60000 : (lastEye !== null ? 0 : plannedMs(pending[0].it))) : null };
+        next: pending.length ? plannedMs(pending[0].it) : null };
     });
     var prevEnd = lastEye !== null ? lastEye + GAP : -Infinity;
     for (;;) {
@@ -624,7 +624,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
       var eff = Math.max(slot, nowUp);
       prevEnd = eff + GAP;
       pick.i++;
-      pick.next = pick.i < pick.pending.length ? eff + pick.md.every * 60000 : null;
+      pick.next = pick.i < pick.pending.length ? plannedMs(pick.pending[pick.i].it) : null;
     }
     // Der Plan gilt nur für diesen Tag: nichts wird nach 23:59 angezeigt
     var endOfDay = eod();
