@@ -106,7 +106,7 @@ section { display: flex; flex-direction: column; gap: 8px; }
 .list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 
 .item { position: relative; }
-.item input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+.item > input[type="checkbox"] { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
 .row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 64px; transition: background 0.15s, opacity 0.15s; }
 .box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; background: transparent; transition: background 0.15s, border-color 0.15s; }
 .box svg { width: 16px; height: 16px; opacity: 0; stroke: var(--accent-fg); }
@@ -532,7 +532,7 @@ button.reset:disabled { opacity: 0.5; cursor: default; }
     var sec = Math.max(0, Math.round(ms / 1000));
     var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), r = sec % 60;
     if (h > 0) return h + ' Std. ' + String(m).padStart(2, '0') + ' Min.';
-    return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+    return String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0') + ' Min.';
   }
   function stamp(id) {
     var s = state[id];
